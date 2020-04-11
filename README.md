@@ -1,6 +1,6 @@
 # scad-node
 
-## UI setup
+## Node setup
 ```
 ./ scad-node.sh
 ```
