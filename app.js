@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser')
 const session = require('express-session')
 const cors = require('cors')
 const mongoose = require('mongoose')
+const basicAuth = require('express-basic-auth')
 
 const authRouter = require('./routes/authRouter')
 const draftPicks = require('./routes/draftPicks-route')
@@ -16,6 +17,7 @@ const draftPicks = require('./routes/draftPicks-route')
 const app = express()
 const port = process.env.PORT || 4000
 
+// MongoDB config
 const uri = "mongodb+srv://admin:scad1234@cluster0-ugtb0.mongodb.net/scad?retryWrites=true&w=majority";
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 mongoose.connection.on('connected', () => debug('Successfully connected to database..'))
@@ -28,6 +30,11 @@ app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
+
+// Basic Auth
+app.use(basicAuth({
+    users: { 'user': 'node-api-readwrite'}
+}))
 
 app.use(express.static(path.join(__dirname, '/public/')))
 //views to use if we're displaying anything in the brower from this url (localhost:4000)
