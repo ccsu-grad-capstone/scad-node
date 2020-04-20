@@ -13,6 +13,7 @@ const basicAuth = require('express-basic-auth')
 
 const authRouter = require('./routes/authRouter')
 const draftPicks = require('./routes/draftPicks-route')
+const capExemptions = require('./routes/capExemptions-route')
 
 const app = express()
 const port = process.env.PORT || 4000
@@ -43,6 +44,7 @@ app.set('view engine', 'ejs')
 
 app.use('/auth', authRouter)
 app.use('/draftPicks', draftPicks)
+app.use('/capExemptions', capExemptions)
 
 app.get('/', (req, res) => {
   res.redirect('http://localhost:8081/about')

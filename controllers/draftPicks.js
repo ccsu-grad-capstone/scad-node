@@ -33,7 +33,7 @@ async function update (id, dp) {
 async function remove (id) {
   debug('Removing DraftPick: ', id)
   try {
-    return new DraftPick(dp).save()
+    return DraftPick.findByIdAndRemove(id).exec()
   } catch (error) {
     debug(error)
   }
