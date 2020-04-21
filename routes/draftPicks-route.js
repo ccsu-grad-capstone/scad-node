@@ -12,10 +12,10 @@ function router() {
   draftPicksRouter.use(middleware)
 
   async function getAllByLeague (req, res) {
-    const { leagueId } = req.params
+    const { leagueId, year } = req.params
     debug(leagueId)
     try {
-      const result = await draftPicks.getAllByLeague(leagueId)
+      const result = await draftPicks.getAllByLeague(leagueId, year)
       res.json({
         data: result
       })
@@ -78,7 +78,7 @@ function router() {
     }
   }
 
-  draftPicksRouter.get('/:leagueId', getAllByLeague)
+  draftPicksRouter.get('/:leagueId/:year', getAllByLeague)
   draftPicksRouter.get('/:leagueId/team/:teamId', getAllByTeam)
   draftPicksRouter.post('/create', create)
   draftPicksRouter.put('/:id', update)

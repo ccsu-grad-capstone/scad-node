@@ -3,10 +3,10 @@ const debug = require('debug')('app:draftPicksController')
 const DraftPick = require('../models/DraftPick')
 
 
-async function getAllByLeague (leagueId) {
+async function getAllByLeague (leagueId, year) {
   debug('Getting all draft picks by league: ', )
   try {
-    return await DraftPick.find( {yahooLeagueId: leagueId} ).sort( { year: 1 } ).limit(180)
+    return await DraftPick.find( {yahooLeagueId: leagueId, year: {$gte : year} }).sort( { year: 1 } ).limit(180)
   } catch (error) {
     debug(error)
   }
