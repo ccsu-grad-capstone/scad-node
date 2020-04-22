@@ -8,7 +8,8 @@ const CapExemptionSchema = new Schema({
   yahooTeamGive: { type: Object, required: true },
   yahooTeamRecieve: { type: Object, required: true },
   amount: { type: Number },
-  comments: { type: String}
+  comments: { type: String},
+  appliedToTeamSalary: { type: Boolean }
 });
 
 const CapExemption = mongoose.model("CapExemption", CapExemptionSchema);

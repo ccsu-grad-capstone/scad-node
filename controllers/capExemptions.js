@@ -2,10 +2,10 @@ const debug = require('debug')('app:capExemptionsController')
 
 const CapExemption = require('../models/CapExemption')
 
-async function getAllByLeague (leagueId) {
+async function getAllByLeague (leagueId, year) {
   debug('Getting all CapExemptions by league: ', )
   try {
-    return await CapExemption.find( {yahooLeagueId: leagueId} ).sort( { year: 1 } )
+    return await CapExemption.find( {yahooLeagueId: leagueId, year: {$gte : year} }).sort( { year: 1 } )
   } catch (error) {
     debug(error)
   }

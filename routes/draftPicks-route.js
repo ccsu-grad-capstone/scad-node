@@ -3,13 +3,10 @@ const draftPicks = require('../controllers/draftPicks')
 const debug = require('debug')('app:draftPicksRouter')
 
 const draftPicksRouter = express.Router()
-
-function middleware(req, res, next) {
-  next()
-}
+const scadAuth = require('../utilities/scadAuth')
 
 function router() {
-  draftPicksRouter.use(middleware)
+  draftPicksRouter.use(scadAuth)
 
   async function getAllByLeague (req, res) {
     const { leagueId, year } = req.params
@@ -26,10 +23,10 @@ function router() {
   }
 
   async function getAllByTeam (req, res) {
-    const { leagueId, teamId } = req.params
-    debug(leagueId, teamId)
+    const { leagueId, year, teamId } = req.params
+    debug(leagueId, year, teamId)
     try {
-      const result = await draftPicks.getAllByLeague(leagueId)
+      const result = await draftPicks.getAllByLeague(leagueId, year)
       let teamPicks = result.filter(t => t.team.team_id == teamId)
         
       res.json({
@@ -79,7 +76,7 @@ function router() {
   }
 
   draftPicksRouter.get('/:leagueId/:year', getAllByLeague)
-  draftPicksRouter.get('/:leagueId/team/:teamId', getAllByTeam)
+  draftPicksRouter.get('/:leagueId/:year/:teamId', getAllByTeam)
   draftPicksRouter.post('/create', create)
   draftPicksRouter.put('/:id', update)
   draftPicksRouter.delete('/remove:id', remove)

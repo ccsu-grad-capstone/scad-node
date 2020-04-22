@@ -32,11 +32,6 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 
-// Basic Auth
-app.use(basicAuth({
-    users: { 'user': 'node-api-readwrite'}
-}))
-
 app.use(express.static(path.join(__dirname, '/public/')))
 //views to use if we're displaying anything in the brower from this url (localhost:4000)
 app.set('views', './views')
