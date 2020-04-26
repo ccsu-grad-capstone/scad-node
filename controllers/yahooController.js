@@ -1,4 +1,5 @@
 const debug = require('debug')('app:yahooController')
+const { getENV } = require('../utilities/enviornment')
 
 function yahooController(service) {
   
@@ -6,7 +7,7 @@ function yahooController(service) {
     var nonce = Math.floor(Math.random() * 1000000 + 1)
     debug(`redirectToYahoo()`)
     res.redirect(
-      `https://api.login.yahoo.com/oauth2/request_auth?client_id=dj0yJmk9a1pBOHVpblRxME9PJmQ9WVdrOVpFaDZWVmxyTkcwbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PWE3&redirect_uri=https://localhost:3000/auth/yahoo/redirect&response_type=code&language=en-us&scope=openid,fspt-w,sdpp-r&nonce=${nonce}`
+      `${process.env.YAHOO_REQUEST_AUTH}?client_id=dj0yJmk9a1pBOHVpblRxME9PJmQ9WVdrOVpFaDZWVmxyTkcwbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PWE3&redirect_uri=${process.env.YAHOO_REDIRECT}&response_type=code&language=en-us&scope=openid,fspt-w,sdpp-r&nonce=${nonce}`
     )
   }
 
@@ -18,8 +19,7 @@ function yahooController(service) {
       // debug(`refresh_token: ${tokens.refresh_token}`)
       // debug(`id_token: ${tokens.id_token}`)
       // res.send(tokens)
-      // res.redirect(`https://scad-ui.firebaseapp.com?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}&id_token=${tokens.id_token}`)
-      res.redirect(`http://localhost:8081/dashboard?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}&id_token=${tokens.id_token}`)
+      res.redirect(`${getENV('VUE_APP_UI')}/dashboard?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}&id_token=${tokens.id_token}`)
     } catch (err) {
       debug(err.stack)
     }
