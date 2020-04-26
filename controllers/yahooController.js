@@ -18,6 +18,7 @@ function yahooController(service) {
       // debug(`refresh_token: ${tokens.refresh_token}`)
       // debug(`id_token: ${tokens.id_token}`)
       // res.send(tokens)
+      // res.redirect(`https://scad-ui.firebaseapp.com?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}&id_token=${tokens.id_token}`)
       res.redirect(`http://localhost:8081/dashboard?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}&id_token=${tokens.id_token}`)
     } catch (err) {
       debug(err.stack)

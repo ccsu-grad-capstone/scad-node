@@ -24,7 +24,7 @@ function router() {
 
   async function getAllByTeam (req, res) {
     const { leagueId, year, teamId } = req.params
-    debug(leagueId, teamId)
+    debug(leagueId, year, teamId)
     try {
       const result = await capExemptions.getAllByLeague(leagueId, year)
       let teamCE = result.filter(t => ((t.yahooTeamGive.team_id == teamId) || (t.yahooTeamRecieve.team_id == teamId)))
@@ -42,6 +42,7 @@ function router() {
     debug('create')
     const ce = req.body.data
     ce.timestamp = moment()
+    debug(ce.timestamp)
     if (ce) {
       try {
         capExemptions.create(ce)
