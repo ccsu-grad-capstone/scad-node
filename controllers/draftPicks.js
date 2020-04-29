@@ -2,11 +2,18 @@ const debug = require('debug')('app:draftPicksController')
 
 const DraftPick = require('../models/DraftPick')
 
-
-async function getAllByLeague (leagueId, year) {
-  debug('Getting all draft picks by league: ', )
+async function checkLeague (leagueId, year) {
   try {
-    return await DraftPick.find( {yahooLeagueId: leagueId, year: {$gte : year} }).sort( { year: 1 } ).limit(180)
+    return await DraftPick.find( {yahooLeagueId: leagueId, yahooLeagueYear: year} )
+  } catch (error) {
+    debug(error)
+  }
+}
+
+async function getAllByLeague (leagueId, year, limit) {
+  debug('Getting all draft picks by league: ')
+  try {
+    return await DraftPick.find( {yahooLeagueId: leagueId, yahooLeagueYear: year, year: {$gte : year} }).sort( { year: 1 } ).limit(limit)
   } catch (error) {
     debug(error)
   }
@@ -40,4 +47,4 @@ async function remove (id) {
 }
 
 
-module.exports = { getAllByLeague, create, update, remove }
+module.exports = { checkLeague, getAllByLeague, create, update, remove }

@@ -8,6 +8,23 @@ const scadAuth = require('../utilities/scadAuth')
 
 function router() {
   capExemptionRouter.use(scadAuth)
+
+  async function checkLeague (req, res) {
+    const { leagueId, year } = req.params
+    debug('checkLeague: ',leagueId)
+    try {
+      const result = await capExemptions.checkLeague(leagueId, year)
+      if (result.length > 0) {
+        res.sendStatus(200)
+      } else {
+        res.sendStatus(204)
+      }
+      
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   async function getAllByLeague (req, res) {
     const { leagueId, year } = req.params
     debug(leagueId)
@@ -55,11 +72,34 @@ function router() {
 
   function update (req, res) {
     const { id } = req.params
-    const dp = req.body.data
+    const ce = req.body.data
     debug('update')
     try {
-      capExemptions.update(id, dp)
+      capExemptions.update(id, ce)
       res.send('Cap Exemption updated successfully')
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async function updateLeague (req, res) {
+    const update = req.body.data
+    debug('updateLeague', update)
+    try {
+      const capExceptions = await capExemptions.getAllByLeague(update.oldId, update.year - 1)
+
+      for (ce of capExceptions) {
+        ce.yahooLeagueId = update.newId
+        ce.yahooLeagueYear = update.year
+        let prev = {
+          year: update.year - 1,
+          yahooLeagueId: update.oldId
+        }
+        ce.prevLeagueIds.push(prev)
+        await capExemptions.update(ce._id, ce)
+      };
+      res.send('Retrieved and updated Cap Exemptions Successfully')
+      debug('DONE')
     } catch (error) {
       console.log(error)
     }
@@ -76,10 +116,11 @@ function router() {
       console.log(error)
     }
   }
-
+  capExemptionRouter.get('/check/:leagueId/:year', checkLeague)
   capExemptionRouter.get('/:leagueId/:year', getAllByLeague)
   capExemptionRouter.get('/:leagueId/:year/:teamId', getAllByTeam)
   capExemptionRouter.post('/create', create)
+  capExemptionRouter.put('/updateLeague', updateLeague)
   capExemptionRouter.put('/:id', update)
   capExemptionRouter.delete('/remove/:id', remove)
 

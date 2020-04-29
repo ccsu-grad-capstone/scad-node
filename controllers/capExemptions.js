@@ -2,6 +2,15 @@ const debug = require('debug')('app:capExemptionsController')
 
 const CapExemption = require('../models/CapExemption')
 
+
+async function checkLeague (leagueId, year) {
+  try {
+    return await CapExemption.find( {yahooLeagueId: leagueId, yahooLeagueYear: year} )
+  } catch (error) {
+    debug(error)
+  }
+}
+
 async function getAllByLeague (leagueId, year) {
   debug('Getting all CapExemptions by league: ', )
   try {
@@ -39,4 +48,4 @@ async function remove (id) {
 }
 
 
-module.exports = { getAllByLeague, create, update, remove }
+module.exports = { checkLeague, getAllByLeague, create, update, remove }
