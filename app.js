@@ -1,15 +1,14 @@
 const express = require('express')
 const chalk = require('chalk')
 const debug = require('debug')('app')
-const morgan = require('morgan')
 const path = require('path')
 const bodyParser = require('body-parser')
-const passport = require('passport')
 const cookieParser = require('cookie-parser')
-const session = require('express-session')
 const cors = require('cors')
 const mongoose = require('mongoose')
-const basicAuth = require('express-basic-auth')
+const fs = require('fs')
+const http = require('http');
+const https = require('https')
 
 const authRouter = require('./routes/authRouter')
 const draftPicks = require('./routes/draftPicks-route')
@@ -20,6 +19,7 @@ const { getENV } = require('./utilities/enviornment')
 dotenv.config()
 const app = express()
 const port = process.env.PORT || 4000
+const httpsPort = 3001
 
 // MongoDB config
 const uri = process.env.MONGO_DB
@@ -48,8 +48,19 @@ app.get('/', (req, res) => {
   res.redirect(`${getENV('VUE_APP_UI')}/about`)
 })
 
-app.listen(port, () => {
-  debug(`listening on port ${chalk.green(port)}`)
-  // debug('process.env: ', process.env)
-})
+var key = fs.readFileSync('./certificates/selfsigned.key');
+var cert = fs.readFileSync('./certificates/selfsigned.crt');
+
+var credentials = {key: key, cert: cert}
+
+// var httpServer = http.createServer(app)
+var httpsServer = https.createServer(credentials, app)
+
+// httpServer.listen(port, () => { debug(`HTTP listening on port ${chalk.green(port)}`) })
+httpsServer.listen(port, () => { debug(`HTTPS listening on port ${chalk.green(port)}`) })
+
+// app.listen(port, () => {
+//   debug(`listening on port ${chalk.green(port)}`)
+//   // debug('process.env: ', process.env)
+// })
 module.exports = app;
