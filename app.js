@@ -22,10 +22,11 @@ const port = process.env.PORT || 4000
 const httpsPort = 3001
 
 // MongoDB config
+const uri
 if (inDevelopment()) {
-  const uri = process.env.MONGO_DB
+  uri = process.env.MONGO_DB
 } else {
-  const uri = 'mongodb://heroku_ckq8kkbx:s3f2c16bmpcu7p5vhdl3egq6s4@ds143201.mlab.com:43201/heroku_ckq8kkbx'
+  uri = 'mongodb://heroku_ckq8kkbx:s3f2c16bmpcu7p5vhdl3egq6s4@ds143201.mlab.com:43201/heroku_ckq8kkbx'
 }
 mongoose.connect(`${uri}`, { useNewUrlParser: true, useUnifiedTopology: true })
 mongoose.connection.on('connected', () => debug(`Successfully connected to database from ${uri}`))
