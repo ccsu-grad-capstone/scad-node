@@ -23,7 +23,8 @@ const httpsPort = 3001
 
 // MongoDB config
 // const uri = process.env.MONGO_DB
-const uri = 'mongodb+srv://admin:scad1234@cluster0-ugtb0.mongodb.net/scad?retryWrites=true&w=majority'
+// const uri = 'mongodb+srv://admin:scad1234@cluster0-ugtb0.mongodb.net/scad?retryWrites=true&w=majority'
+const ur = 'mongodb://heroku_ckq8kkbx:s3f2c16bmpcu7p5vhdl3egq6s4@ds143201.mlab.com:43201/heroku_ckq8kkbx'
 mongoose.connect(`${uri}`, { useNewUrlParser: true, useUnifiedTopology: true })
 mongoose.connection.on('connected', () => debug(`Successfully connected to database from ${uri}`))
 mongoose.connection.on('disconnected', () => debug('Database disconnected..'))
