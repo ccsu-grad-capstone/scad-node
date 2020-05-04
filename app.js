@@ -22,7 +22,7 @@ const port = process.env.PORT || 4000
 const httpsPort = 3001
 
 // MongoDB config
-const uri
+const uri =''
 if (inDevelopment()) {
   uri = process.env.MONGO_DB
 } else {
