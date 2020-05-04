@@ -9,7 +9,7 @@ const getENV = (key) => {
     return process.env[endpoint]
   } else if (inProduction()) {
     let endpoint = `${key}_PROD`
-    return `process.env.${endpoint}`
+    return process.env[endpoint]
   } else {
     console.log('ENVIORNMENT ERROR')
   }
