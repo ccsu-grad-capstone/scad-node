@@ -14,7 +14,8 @@ const authRouter = require('./routes/authRouter')
 const draftPicks = require('./routes/draftPicks-route')
 const capExemptions = require('./routes/capExemptions-route')
 const dotenv = require('dotenv')
-const { getENV, inDevelopment } = require('./utilities/enviornment')
+const { inDevelopment } = require('./utilities/enviornment')
+const { MONGODB_URI, VUE_APP_UI } = require('./config')
 
 dotenv.config()
 const app = express()
@@ -22,12 +23,7 @@ const port = process.env.PORT || 4000
 const httpsPort = 3001
 
 // MongoDB config
-var uri =''
-if (inDevelopment()) {
-  uri = process.env.MONGO_DB
-} else {
-  uri = 'mongodb://heroku_ckq8kkbx:s3f2c16bmpcu7p5vhdl3egq6s4@ds143201.mlab.com:43201/heroku_ckq8kkbx'
-}
+var uri = MONGODB_URI
 mongoose.connect(`${uri}`, { useNewUrlParser: true, useUnifiedTopology: true })
 mongoose.connection.on('connected', () => debug(`Successfully connected to database from ${uri}`))
 mongoose.connection.on('disconnected', () => debug('Database disconnected..'))
@@ -50,7 +46,7 @@ app.use('/draftPicks', draftPicks)
 app.use('/capExemptions', capExemptions)
 
 app.get('/', (req, res) => {
-  res.redirect(`https://scad-ui.firebaseapp.com/about`)
+  res.redirect(`${VUE_APP_UI}/about`)
 })
 
 var key = fs.readFileSync('./certificates/selfsigned.key');
