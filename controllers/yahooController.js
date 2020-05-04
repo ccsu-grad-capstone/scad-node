@@ -1,5 +1,5 @@
 const debug = require('debug')('app:yahooController')
-const { getENV } = require('../utilities/enviornment')
+const { YAHOO_REQUEST_AUTH, YAHOO_REDIRECT} = require('./config')
 
 function yahooController(service) {
   
@@ -7,7 +7,7 @@ function yahooController(service) {
     var nonce = Math.floor(Math.random() * 1000000 + 1)
     debug(`redirectToYahoo()`)
     res.redirect(
-      `${process.env.YAHOO_REQUEST_AUTH}?client_id=dj0yJmk9a1pBOHVpblRxME9PJmQ9WVdrOVpFaDZWVmxyTkcwbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PWE3&redirect_uri=${process.env.YAHOO_REDIRECT}&response_type=code&language=en-us&scope=openid,fspt-w,sdpp-r&nonce=${nonce}`
+      `${YAHOO_REQUEST_AUTH}?client_id=dj0yJmk9a1pBOHVpblRxME9PJmQ9WVdrOVpFaDZWVmxyTkcwbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PWE3&redirect_uri=${YAHOO_REDIRECT}&response_type=code&language=en-us&scope=openid,fspt-w,sdpp-r&nonce=${nonce}`
     )
   }
 
@@ -19,7 +19,7 @@ function yahooController(service) {
       // debug(`refresh_token: ${tokens.refresh_token}`)
       // debug(`id_token: ${tokens.id_token}`)
       // res.send(tokens)
-      res.redirect(`${getENV('VUE_APP_UI')}/dashboard?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}&id_token=${tokens.id_token}`)
+      res.redirect(`${VUE_APP_UI}/dashboard?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}&id_token=${tokens.id_token}`)
     } catch (err) {
       debug(err.stack)
     }
