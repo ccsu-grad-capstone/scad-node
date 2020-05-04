@@ -14,7 +14,7 @@ const authRouter = require('./routes/authRouter')
 const draftPicks = require('./routes/draftPicks-route')
 const capExemptions = require('./routes/capExemptions-route')
 const dotenv = require('dotenv')
-const { getENV } = require('./utilities/enviornment')
+const { getENV, inDevelopment } = require('./utilities/enviornment')
 
 dotenv.config()
 const app = express()
@@ -55,14 +55,11 @@ var cert = fs.readFileSync('./certificates/selfsigned.crt');
 
 var credentials = {key: key, cert: cert}
 
-// var httpServer = http.createServer(app)
-var httpsServer = https.createServer(credentials, app)
-
-// httpServer.listen(port, () => { debug(`HTTP listening on port ${chalk.green(port)}`) })
-httpsServer.listen(port, () => { debug(`HTTPS listening on port ${chalk.green(port)}`) })
-
-// app.listen(port, () => {
-//   debug(`listening on port ${chalk.green(port)}`)
-//   // debug('process.env: ', process.env)
-// })
+if (inDevelopment()) {
+  var httpsServer = https.createServer(credentials, app)
+  httpsServer.listen(port, () => { debug(`HTTPS listening on port ${chalk.green(port)}`) })
+} else {
+  var httpServer = http.createServer(app)
+  httpServer.listen(port, () => { debug(`HTTP listening on port ${chalk.green(port)}`) })
+}
 module.exports = app;
