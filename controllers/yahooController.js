@@ -1,5 +1,5 @@
 const debug = require('debug')('app:yahooController')
-const { YAHOO_REQUEST_AUTH, YAHOO_REDIRECT} = require('./config')
+const { YAHOO_REQUEST_AUTH, YAHOO_REDIRECT} = require('../config')
 
 function yahooController(service) {
   

@@ -1,7 +1,7 @@
 const axios = require('axios')
 const xml2js = require('xml2js')
 const debug = require('debug')('app:yahooOauth')
-const { YAHOO_REDIRECT, YAHOO_REFRESH, YAHOO_GET_TOKEN } = require('./config')
+const { YAHOO_REDIRECT, YAHOO_REFRESH, YAHOO_GET_TOKEN } = require('../config')
 
 
 var parser = xml2js.Parser({ explicitArray: false })
