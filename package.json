@@ -41,5 +41,8 @@
       "NODE_ENV": "development",
       "PORT": "3000"
     }
+  },
+  "engines" : { 
+    "node" : ">=8.0.0 <11.0.0" 
   }
 }
