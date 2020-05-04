@@ -4,6 +4,7 @@ const inDevelopment = () => process.env.NODE_ENV === 'development'
 const inProduction = () => process.env.NODE_ENV === 'production'
 
 const getENV = (key) => {
+  console.log(process.env)
   if (inDevelopment()) {
     let endpoint = `${key}_DEV`
     return process.env[endpoint]
