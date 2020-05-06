@@ -56,7 +56,7 @@ var credentials = {key: key, cert: cert}
 
 if (inDevelopment()) {
   var httpsServer = https.createServer(credentials, app)
-  httpsServer.listen(port, () => { debug(`HTTPS listening on port ${chalk.green(port)} process.env.inDev: ${process.env}`) })
+  httpsServer.listen(port, () => { debug(`HTTPS listening on port ${chalk.green(port)} process.env.inDev: ${process.env.VUE_APP_UI}`) })
 } else {
   var httpServer = http.createServer(app)
   httpServer.listen(port, () => { debug(`HTTP listening on port ${chalk.green(port)} process.env.inProd: ${process.env}`) })
