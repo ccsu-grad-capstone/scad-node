@@ -1,5 +1,5 @@
 const debug = require('debug')('app:yahooController')
-const { YAHOO_REQUEST_AUTH, YAHOO_REDIRECT, VUE_APP_UI} = require('../config')
+const { YAHOO_REQUEST_AUTH, YAHOO_REDIRECT, VUE_APP_UI, YAHOO_CLIENT_ID} = require('../config')
 
 function yahooController(service) {
   
@@ -7,7 +7,7 @@ function yahooController(service) {
     var nonce = Math.floor(Math.random() * 1000000 + 1)
     debug(`redirectToYahoo()`)
     res.redirect(
-      `${YAHOO_REQUEST_AUTH}?client_id=dj0yJmk9a1pBOHVpblRxME9PJmQ9WVdrOVpFaDZWVmxyTkcwbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PWE3&redirect_uri=${YAHOO_REDIRECT}&response_type=code&language=en-us&scope=openid,fspt-w,sdpp-r&nonce=${nonce}`
+      `${YAHOO_REQUEST_AUTH}?client_id=${YAHOO_CLIENT_ID}&redirect_uri=${YAHOO_REDIRECT}&response_type=code&language=en-us&scope=openid,fspt-w,sdpp-r&nonce=${nonce}`
     )
   }
 
