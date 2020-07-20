@@ -45,7 +45,6 @@ function router() {
     try {
       const result = await capExemptions.getAllByLeague(leagueId, year)
       let teamCE = result.filter(t => ((t.yahooTeamGive.team_id == teamId) || (t.yahooTeamRecieve.team_id == teamId)))
-        
       res.json({
         data: teamCE
       })
