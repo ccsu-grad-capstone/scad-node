@@ -6,7 +6,7 @@ async function checkLeague (leagueId, year) {
   try {
     return await DraftPick.find( {yahooLeagueId: leagueId, yahooLeagueYear: year} )
   } catch (error) {
-    debug(error)
+    throw (error)
   }
 }
 
@@ -15,34 +15,34 @@ async function getAllByLeague (leagueId, year, limit) {
   try {
     return await DraftPick.find( {yahooLeagueId: leagueId, yahooLeagueYear: year, year: {$gte : year} }).sort( { year: 1 } ).limit(limit)
   } catch (error) {
-    debug(error)
+    throw (error)
   }
 }
 
 async function create (dp) {
   debug('Creating new DraftPick')
   try {
-    return new DraftPick(dp).save()
+    return await new DraftPick(dp).save()
   } catch (error) {
-    debug(error)
+    throw (error)
   }
 }
 
 async function update (id, dp) {
   debug('Updating DraftPick: ', id)
   try {
-    return DraftPick.findByIdAndUpdate(id, dp, { new: true, runValidators: true }).exec()
+    return await DraftPick.findByIdAndUpdate(id, dp, { new: true, runValidators: true }).exec()
   } catch (error) {
-    debug(error)
+    throw (error)
   }
 }
 
 async function remove (id) {
   debug('Removing DraftPick: ', id)
   try {
-    return DraftPick.findByIdAndRemove(id).exec()
+    return await DraftPick.findByIdAndRemove(id).exec()
   } catch (error) {
-    debug(error)
+    throw (error)
   }
 }
 

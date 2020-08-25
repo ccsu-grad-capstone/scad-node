@@ -20,7 +20,8 @@ function router() {
       }
       
     } catch (error) {
-      console.log(error)
+      debug(error)
+      res.status(500).send('An Error Occured Retrieving Draft Picks')
     }
   }
 
@@ -34,7 +35,8 @@ function router() {
       })
       
     } catch (error) {
-      console.log(error)
+      debug(error)
+      res.status(500).send('An Error Occured Retrieving Draft Picks')
     }
   }
 
@@ -50,7 +52,8 @@ function router() {
       })
       
     } catch (error) {
-      console.log(error)
+      debug(error)
+      res.status(500).send('An Error Occured Retrieving Draft Picks')
     }
   }
 
@@ -61,8 +64,11 @@ function router() {
         draftPicks.create(dp)
         res.send('Draft Pick Created successfully')
       } catch (error) {
-        console.log(error)
+        debug(error)
+        res.status(500).send('An Error Occured Updating Draft Pick')
       }
+    } else {
+      res.status(500).send('No Draft Pick supplied with request.')
     }
   }
 
@@ -74,7 +80,8 @@ function router() {
       draftPicks.update(id, dp)
       res.send('Draft Pick updated successfully')
     } catch (error) {
-      console.log(error)
+      debug(error)
+      res.status(500).send('An Error Occured Updating Draft Pick')
     }
   }
 
@@ -94,10 +101,10 @@ function router() {
         p.prevLeagueIds.push(prev)
         await draftPicks.update(p._id, p)
       };
-      res.send('Retrieved and updated Draft Picks Successfully')
-      console.log('DONE')
+      res.send('Retrieved and Updated Draft Picks Successfully')
     } catch (error) {
-      console.log(error)
+      debug(error)
+      res.status(500).send('An Error Occured Updating Draft Picks')
     }
   }
 
@@ -109,7 +116,8 @@ function router() {
       res.send('Draft Pick removed successfully')
 
     } catch (error) {
-      console.log(error)
+      debug(error)
+      res.status(500).send('An Error Occured Removing Draft Picks')
     }
   }
 

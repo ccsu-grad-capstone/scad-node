@@ -7,7 +7,7 @@ async function checkLeague (leagueId, year) {
   try {
     return await CapExemption.find( {yahooLeagueId: leagueId, yahooLeagueYear: year} )
   } catch (error) {
-    debug(error)
+    throw (error)
   }
 }
 
@@ -16,34 +16,34 @@ async function getAllByLeague (leagueId, year) {
   try {
     return await CapExemption.find( {yahooLeagueId: leagueId, year: {$gte : year} }).sort( { year: 1 } )
   } catch (error) {
-    debug(error)
+    throw (error)
   }
 }
 
 async function create (dp) {
   debug('Creating new CapExemption')
   try {
-    return new CapExemption(dp).save()
+    return await new CapExemption(dp).save()
   } catch (error) {
-    debug(error)
+    throw (error)
   }
 }
 
 async function update (id, dp) {
   debug('Updating CapExemption: ', id)
   try {
-    return CapExemption.findByIdAndUpdate(id, dp, { new: true, runValidators: true }).exec()
+    return await CapExemption.findByIdAndUpdate(id, dp, { new: true, runValidators: true }).exec()
   } catch (error) {
-    debug(error)
+    throw (error)
   }
 }
 
 async function remove (id) {
   debug('Removing CapExemption: ', id)
   try {
-    return CapExemption.findByIdAndRemove(id).exec()
+    return await CapExemption.findByIdAndRemove(id).exec()
   } catch (error) {
-    debug(error)
+    throw (error)
   }
 }
 

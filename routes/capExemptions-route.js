@@ -11,7 +11,7 @@ function router() {
 
   async function checkLeague (req, res) {
     const { leagueId, year } = req.params
-    debug('checkLeague: ',leagueId)
+    debug('checkLeague')
     try {
       const result = await capExemptions.checkLeague(leagueId, year)
       if (result.length > 0) {
@@ -21,13 +21,14 @@ function router() {
       }
       
     } catch (error) {
-      console.log(error)
+      debug(error)
+      res.status(500).send('An Error Occured Retrieving Cap Exemptions')
     }
   }
 
   async function getAllByLeague (req, res) {
+    debug('getAllByLeague')
     const { leagueId, year } = req.params
-    debug(leagueId)
     try {
       const result = await capExemptions.getAllByLeague(leagueId, year)
       res.json({
@@ -35,13 +36,14 @@ function router() {
       })
       
     } catch (error) {
-      console.log(error)
+      debug(error)
+      res.status(500).send('An Error Occured Retrieving Cap Exemptions')
     }
   }
 
   async function getAllByTeam (req, res) {
+    debug(getAllByTeam)
     const { leagueId, year, teamId } = req.params
-    debug(leagueId, year, teamId)
     try {
       const result = await capExemptions.getAllByLeague(leagueId, year)
       let teamCE = result.filter(t => ((t.yahooTeamGive.team_id == teamId) || (t.yahooTeamRecieve.team_id == teamId)))
@@ -50,7 +52,8 @@ function router() {
       })
       
     } catch (error) {
-      console.log(error)
+      debug(error)
+      res.status(500).send('An Error Occured Retrieving Cap Exemptions')
     }
   }
 
@@ -58,13 +61,13 @@ function router() {
     debug('create')
     const ce = req.body.data
     ce.timestamp = moment()
-    debug(ce.timestamp)
     if (ce) {
       try {
         capExemptions.create(ce)
         res.send('Cap Exemption Created successfully')
       } catch (error) {
-        console.log(error)
+        debug(error)
+        res.status(500).send('An Error Occured Creating Cap Exemptions')
       }
     }
   }
@@ -77,13 +80,14 @@ function router() {
       capExemptions.update(id, ce)
       res.send('Cap Exemption updated successfully')
     } catch (error) {
-      console.log(error)
+      debug(error)
+      res.status(500).send('An Error Occured Updating Cap Exemptions')
     }
   }
 
   async function updateLeague (req, res) {
     const update = req.body.data
-    debug('updateLeague', update)
+    debug('updateLeague')
     try {
       const capExceptions = await capExemptions.getAllByLeague(update.oldId, update.year - 1)
 
@@ -98,9 +102,9 @@ function router() {
         await capExemptions.update(ce._id, ce)
       };
       res.send('Retrieved and updated Cap Exemptions Successfully')
-      debug('DONE')
     } catch (error) {
-      console.log(error)
+      debug(error)
+      res.status(500).send('An Error Occured Retrieving Cap Exemptions')
     }
   }
 
@@ -112,7 +116,8 @@ function router() {
       res.send('Cap Exemption removed successfully')
 
     } catch (error) {
-      console.log(error)
+      debug(error)
+      res.status(500).send('An Error Occured Removing Cap Exemptions')
     }
   }
   capExemptionRouter.get('/check/:leagueId/:year', checkLeague)
