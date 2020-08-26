@@ -7,6 +7,7 @@ async function get (leagueId, year) {
     return await Transaction.find( {yahooLeagueId: leagueId, yahooLeagueYear: year} )
   } catch (error) {
     throw (error)
+    
   }
 }
 
