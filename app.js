@@ -16,7 +16,7 @@ const capExemptions = require('./routes/capExemptions-route')
 const transactions = require('./routes/transactions-route')
 const dotenv = require('dotenv')
 const { inDevelopment } = require('./utilities/enviornment')
-const { MONGODB_URI, VUE_APP_UI } = require('./config')
+const { DB_URI, VUE_APP_UI } = require('./config')
 
 dotenv.config()
 const app = express()
@@ -24,7 +24,7 @@ const port = process.env.PORT || 4000
 const httpsPort = 3001
 
 // MongoDB config
-var uri = MONGODB_URI
+var uri = DB_URI
 mongoose.connect(`${uri}`, { useNewUrlParser: true, useUnifiedTopology: true })
 mongoose.connection.on('connected', () => debug(`Successfully connected to database from ${uri}`))
 mongoose.connection.on('disconnected', () => debug('Database disconnected..'))
