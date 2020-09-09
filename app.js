@@ -18,7 +18,6 @@ const diagnostic = require('./routes/diagnostic-route')
 const dotenv = require('dotenv')
 const { inDevelopment } = require('./utilities/enviornment')
 const { DB_URI, VUE_APP_UI } = require('./config')
-const diagnostic = require('./controllers/diagnostic')
 
 dotenv.config()
 const app = express()

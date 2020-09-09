@@ -29,7 +29,7 @@ function router() {
     if (d) {
       try {
         diagnostic.create(d)
-        res.send('dDagnostic Created successfully')
+        res.send('Dagnostic Created successfully')
       } catch (error) {
         debug(error)
         res.status(500).send('An Error Occured Updating Diagnostic')
@@ -41,10 +41,10 @@ function router() {
 
   function updateDiagnostic (req, res) {
     const { id } = req.params
-    const p = req.body.data
+    const d = req.body.data
     debug('update')
     try {
-      diagnostic.update(id, p)
+      diagnostic.update(id, d)
       res.send('Diagnostic updated successfully')
     } catch (error) {
       debug(error)
