@@ -1,67 +1,75 @@
 const express = require('express')
-const transactions = require('../controllers/transactions')
-const debug = require('debug')('app:transactionsRouter')
+const transaction = require('../controllers/transaction')
+const debug = require('debug')('app:transaction')
 
-const transactionsRouter = express.Router()
+const transactionRouter = express.Router()
 const scadAuth = require('../utilities/scadAuth')
 
 function router() {
-  transactionsRouter.use(scadAuth)
+  transactionRouter.use(scadAuth)
 
-  async function get (req, res) {
-    const { leagueId, year } = req.params
-    debug('get()', leagueId)
+  async function getTransaction (req, res) {
+    const { yahooLeagueId } = req.params
+    debug(yahooLeagueId)
     try {
-      const result = await transactions.get(leagueId, year)
-      if (result) {
-        res.json({
-          data: result
-        })
-      } else {
-        res.status(400).send('Transaction doesn\'t exists')
-      }
+      const result = await transaction.get(yahooLeagueId)
+      res.json({
+        data: result
+      })
       
     } catch (error) {
       debug(error)
-      res.status(500).send('An Error Occured Retrieving Draft Picks')
-
+      res.status(500).send('An Error Occured Retrieving Transaction')
     }
   }
 
-  async function create (req, res) {
-    debug('create()')
-    const trans = req.body.data
-    if (trans) {
+  function createTransaction (req, res) {
+    const t = req.body.data
+    debug('create')
+    if (t) {
       try {
-        let result = await transactions.create(trans)
-        if (result) {
-          res.send('Transaction Created Successfully')
-        } else {
-          res.status(400).send('Transaction already exists')
-        }
+        transaction.create(t)
+        res.send('Transaction Created successfully')
       } catch (error) {
         debug(error)
-        res.status(500).send('An Error Occured Creating Transaction')
+        res.status(500).send('An Error Occured Updating transaction')
       }
     } else {
-      res.status(500).send('No Transaction Supplied with Request')
+      res.status(500).send('No Transaction supplied with request.')
     }
   }
 
-  async function update (req, res) {
-    debug('update()', leagueId)
+  function updateTransaction (req, res) {
+    const { id } = req.params
+    const t = req.body.data
+    debug('update')
+    try {
+      transaction.update(id, t)
+      res.send('Transaction updated successfully')
+    } catch (error) {
+      debug(error)
+      res.status(500).send('An Error Occured Updating Transaction')
+    }
   }
 
-  async function remove (req, res) {
-    debug('remove()', leagueId)
+  function removeTransaction (req, res) {
+    const { id } = req.params
+    debug('remove')
+    try {
+      transaction.remove(id)
+      res.send('Transaction removed successfully')
+    } catch (error) {
+      debug(error)
+      res.status(500).send('An Error Occured Removing Transactions')
+    }
   }
 
-  transactionsRouter.get('/lastTimestamp', get)
-  transactionsRouter.post('/create', create)
-  transactionsRouter.put('/:id', update)
-  transactionsRouter.delete('/remove:id', remove)
+  transactionRouter.get('/:yahooLeagueId', getTransaction)
+  transactionRouter.post('/create', createTransaction)
+  transactionRouter.put('/update/:id', updateTransaction)
+  transactionRouter.delete('/:id', removeTransaction)
 
-  return transactionsRouter
+  return transactionRouter
 }
 
 module.exports = router()

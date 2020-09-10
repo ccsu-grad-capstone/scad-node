@@ -2,10 +2,8 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const TransactionSchema = new Schema({
-  timestamp: { type: Date, required: true },
-  yahooLeagueId: { type: String, required: true },
-  yahooLeagueYear: { type: Number, required: true },
-  prevLeagueIds: { type: Array } 
+  lastChecked: { type: Date, required: true },
+  yahooLeagueId: { type: String, required: true }
 });
 
 const Transaction = mongoose.model("Transaction", TransactionSchema);

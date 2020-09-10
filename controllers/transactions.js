@@ -1,46 +1,40 @@
-const debug = require('debug')('app:transactionsController')
+const debug = require('debug')('app:TransactionsController')
 
 const Transaction = require('../models/Transaction')
 
-async function get (leagueId, year) {
+async function get (yahooLeagueId) {
+  debug('Get Transaction from Mongo')
   try {
-    return await Transaction.find( {yahooLeagueId: leagueId, yahooLeagueYear: year} )
+    return await Transaction.find({ yahooLeagueId: yahooLeagueId }).exec()
   } catch (error) {
-    throw (error)
+    debug (error)
   }
 }
 
-async function create (transaction) {
-  debug('create()')
+async function create (t) {
+  debug('Creating Transaction to Mongo')
   try {
-    let exists = await Transaction.find( {yahooLeagueId: transaction.yahooLeagueId, yahooLeagueYear: transaction.yahooLeagueYear} ).countDocuments() > 0 ? true : false
-    if (exists) {
-      debug('Transaction already exists')
-      return false
-    } else {
-      debug('Creating New Transaction')
-      return await new Transaction(transaction).save()
-    }
+    return await new Transaction(t).save()
   } catch (error) {
-    throw (error)
+    debug (error)
   }
 }
 
-async function update (id, dp) {
-  debug('Updating Transaction: ', id)
+async function update (id, t) {
+  debug('Updating Transaction with Mongo')
   try {
-    return await Transaction.findByIdAndUpdate(id, dp, { new: true, runValidators: true }).exec()
+    return await Transaction.findByIdAndUpdate(id, t, { new: true, runValidators: true }).exec()
   } catch (error) {
-    throw (error)
+    debug (error)
   }
 }
 
 async function remove (id) {
-  debug('Removing Transaction: ', id)
+  debug('Removing Transaction from Mongo')
   try {
     return await Transaction.findByIdAndRemove(id).exec()
   } catch (error) {
-    throw (error)
+    debug (error)
   }
 }
 
