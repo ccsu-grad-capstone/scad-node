@@ -42,7 +42,7 @@ function router() {
   }
 
   async function getAllByTeam (req, res) {
-    debug(getAllByTeam)
+    debug('getAllByTeam')
     const { leagueId, year, teamId } = req.params
     try {
       const result = await capExemptions.getAllByLeague(leagueId, year)

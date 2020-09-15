@@ -1,12 +1,28 @@
 const express = require('express')
 const transaction = require('../controllers/transaction')
 const debug = require('debug')('app:transaction')
+const yf = require('../services/yahooFantasy')
 
 const transactionRouter = express.Router()
 const scadAuth = require('../utilities/scadAuth')
 
 function router() {
   transactionRouter.use(scadAuth)
+
+  async function getYahooTransactions (req, res) {
+    const { accessToken, yahooLeagueId } = req.params
+    debug(accessToken, yahooLeagueId)
+    try {
+      let result = await yf.getTransactions(accessToken, yahooLeagueId)
+      res.json({
+        transactions: result
+      })
+      
+    } catch (error) {
+      debug(error)
+      res.status(500).send('An Error Occured Retrieving Transactions')
+    }
+  }
 
   async function getTransaction (req, res) {
     const { yahooLeagueId } = req.params
@@ -65,6 +81,7 @@ function router() {
   }
 
   transactionRouter.get('/:yahooLeagueId', getTransaction)
+  transactionRouter.get('/yahoo/:yahooLeagueId/:accessToken', getYahooTransactions)
   transactionRouter.post('/create', createTransaction)
   transactionRouter.put('/update/:id', updateTransaction)
   transactionRouter.delete('/:id', removeTransaction)

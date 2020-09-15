@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 
 const TransactionSchema = new Schema({
   lastChecked: { type: Date, required: true },
-  yahooLeagueId: { type: String, required: true }
+  yahooLeagueId: { type: String, required: true },
+  lastTimestamp: { type: String }
 });
 
 const Transaction = mongoose.model("Transaction", TransactionSchema);
