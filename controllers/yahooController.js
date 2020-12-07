@@ -12,7 +12,7 @@ function yahooController(service) {
   }
 
   async function getAccessTokens(req, res) {
-    // console.log(getAccessTokens)
+
     const { code } = req.query
     try {
       const tokens = await service.getAccessTokens(code)
