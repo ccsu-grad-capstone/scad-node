@@ -1,6 +1,6 @@
 ## Shall script to run scad-ui
 
-HTTP_PORT=3000
+HTTP_PORT=4000
 
 
 echo " "
