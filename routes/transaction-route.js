@@ -11,7 +11,7 @@ function router() {
 
   async function getYahooTransactions (req, res) {
     const { accessToken, yahooLeagueId } = req.params
-    debug(accessToken, yahooLeagueId)
+    // debug(accessToken, yahooLeagueId)
     try {
       let result = await yf.getTransactions(accessToken, yahooLeagueId)
       res.json({
