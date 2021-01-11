@@ -7,7 +7,59 @@ const GAMEKEY = '399'
 
 function yahooFantasy() {
 
-  async function getTransactions(accessToken, yahooLeagueId) {
+  async function getMyTeams(accessToken) {
+    try {
+      var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
+      yf.setUserToken(accessToken)
+      
+      let result = await yf.user.game_teams(`${GAMEKEY}`)
+      return result
+      
+    } catch (error) {
+      debug('ERR', error)
+    }
+  }
+
+  async function getLeagueSettings(accessToken, yahooLeagueId) {
+    try {
+      var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
+      yf.setUserToken(accessToken)
+      
+      let result = await yf.league.settings(`${GAMEKEY}.l.${yahooLeagueId}`)
+      return result
+      
+    } catch (error) {
+      debug('ERR', error)
+    }
+  }
+
+  async function getLeagueStandings(accessToken, yahooLeagueId) {
+    try {
+      var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
+      yf.setUserToken(accessToken)
+      
+      let result = await yf.league.standings(`${GAMEKEY}.l.${yahooLeagueId}`)
+      return result
+      
+    } catch (error) {
+      debug('ERR', error)
+    }
+  }
+
+  async function getLeagueTeams(accessToken, yahooLeagueId) {
+    try {
+      var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
+      yf.setUserToken(accessToken)
+      
+      let result = await yf.league.teams(`${GAMEKEY}.l.${yahooLeagueId}`)
+      return result
+      
+    } catch (error) {
+      debug('ERR', error)
+    }
+  }
+
+  async function getLeagueTransactions(accessToken, yahooLeagueId) {
     try {
       var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
       yf.setUserToken(accessToken)
@@ -18,41 +70,16 @@ function yahooFantasy() {
       
     } catch (error) {
       debug('ERR', error)
-
     }
   }
 
-  // Used to get players photos for PFF. 
-  async function getPlayers(accessToken, yahooLeagueId) {
-    try {
-      var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
-      yf.setUserToken(accessToken)
-      
-      const start = [0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800, 825, 850, 875, 900, 925, 950, 975, 1000]
-      let players = []
-      for (let i = 0; i < 1200; i += 25) {
-        let result = await yf.players.leagues(`${GAMEKEY}.l.65939`, { start: i, sort: 'PTS', count: 25})
-        debug(result[0].players.length)
-        for (const p of result[0].players) {
-          players.push(p)
-        }
-        // debug(result[0].players[0])
-        debug('PLAYERS COUNT: ', players.length)
-      }
-      debug('FINAL PLAYERS COUNT: ', players.length)
-      // console.log(players)
-
-      fs.writeFileSync('players', JSON.stringify(players))
-
-      return players
-      
-
-    } catch (error) {
-      debug('ERR', error)
-
-    }
-  }
-  return { getTransactions, getPlayers }
+  return { 
+    getMyTeams,
+    getLeagueSettings,
+    getLeagueStandings,
+    getLeagueTeams,
+    getLeagueTransactions
+   }
 }
 
 module.exports = yahooFantasy()
