@@ -22,7 +22,7 @@ function yahooFantasy() {
     }
   }
 
-  // Used to get play photos for PFF. 
+  // Used to get players photos for PFF. 
   async function getPlayers(accessToken, yahooLeagueId) {
     try {
       var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)

@@ -3,6 +3,7 @@ const debug = require('debug')('app:scadAuth')
 
 
 function scadAuth () {
+  // debug('*****')
   // Basic Auth
   return basicAuth({
     users: { 'user': 'node-api-readwrite'},
@@ -16,4 +17,4 @@ function scadAuth () {
   }
 }
 
-module.exports = scadAuth()
+module.exports = scadAuth
