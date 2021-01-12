@@ -84,6 +84,7 @@ async function getAllUsersLeagues(req, res) {
   const { accessToken, yahooLeagueId } = req.params
   try {
     let result = await yf.getAllUsersLeagues(accessToken, yahooLeagueId)
+    let games = await yf.getGames(accessToken)
     res.json({
       leagues: result,
     })

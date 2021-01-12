@@ -5,6 +5,19 @@ const fs = require('fs')
 const GAMEKEY = '399'
 
 function yahooFantasy() {
+
+  async function getGames(accessToken) {
+    try {
+      var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
+      yf.setUserToken(accessToken)
+
+      let result = await yf.user.games()
+      return result
+    } catch (error) {
+      debug('ERR', error)
+    }
+  }
+
   async function getMyTeams(accessToken) {
     try {
       var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
@@ -83,6 +96,7 @@ function yahooFantasy() {
   }
 
   return {
+    getGames,
     getMyTeams,
     getLeagueSettings,
     getLeagueStandings,
