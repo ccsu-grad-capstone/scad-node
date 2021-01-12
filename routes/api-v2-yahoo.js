@@ -10,6 +10,7 @@ yahooRouter.get('/league/:yahooLeagueId/myTeam/:accessToken', scadAuth(), getMyT
 yahooRouter.get('/league/:yahooLeagueId/settings/:accessToken', scadAuth(), getLeagueSettings)
 yahooRouter.get('/league/:yahooLeagueId/standings/:accessToken', scadAuth(), getLeagueStandings)
 yahooRouter.get('/league/:yahooLeagueId/teams/:accessToken', scadAuth(), getLeagueTeams)
+yahooRouter.get('/league/all/:accessToken', scadAuth(), getAllUsersLeagues)
 yahooRouter.get('/league/:yahooLeagueId/transactions/:accessToken', scadAuth(), getLeagueTransactions)
 
 module.exports = yahooRouter
@@ -76,6 +77,19 @@ async function getLeagueTeams(req, res) {
   } catch (error) {
     debug(error)
     res.status(500).send('An Error Occured Retrieving League Teams')
+  }
+}
+
+async function getAllUsersLeagues(req, res) {
+  const { accessToken, yahooLeagueId } = req.params
+  try {
+    let result = await yf.getAllUsersLeagues(accessToken, yahooLeagueId)
+    res.json({
+      leagues: result,
+    })
+  } catch (error) {
+    debug(error)
+    res.status(500).send('An Error Occured Retrieving League Players')
   }
 }
 
