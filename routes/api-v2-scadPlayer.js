@@ -9,7 +9,6 @@ scadPlayerRouter.get('/:id', scadAuth(), getById)
 scadPlayerRouter.put('/:id', scadAuth(), update)
 scadPlayerRouter.post('/', scadAuth(), create)
 scadPlayerRouter.delete('/:id', scadAuth(), remove)
-scadPlayerRouter.get('/all', scadAuth(), getAll)
 
 module.exports = scadPlayerRouter
 
@@ -64,18 +63,5 @@ function remove(req, res) {
   } catch (error) {
     debug(error)
     res.status(500).send('An Error Occured Removing Scad Player')
-  }
-}
-
-async function getAll(req, res) {
-  debug('getAll')
-  try {
-    const result = await scadPlayer.getAll()
-    res.json({
-      scadPlayers: result,
-    })
-  } catch (error) {
-    debug(error)
-    res.status(500).send('An Error Occured Retrieving Scad Player')
   }
 }

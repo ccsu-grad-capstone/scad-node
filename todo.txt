@@ -1,0 +1,64 @@
+Yahoo APIs
+
+// GET / yahoo / league / { leagueId } / myTeam - Gets MyTeam from yahoo by leagueId
+// GET / yahoo / league / all - Gets user Leagues from yahoo by season
+// GET / yahoo / league / { leagueId } - Get specific League from yahoo by leagueId
+// GET / yahoo / league / { leagueId } / teams - Gets all Teams from yahoo by leagueId
+// GET / yahoo / league / { leagueId } / settings - Gets Settings from yahoo by leagueId
+// GET / yahoo / league / { leagueId } / standings - Gets Standings from yahoo by leagueId
+// GET / yahoo / league / { leagueId } / team / { teamId } / roster - Gets Team & Roster details from yahoo by leagueId and teamId
+// GET / yahoo / league / { leagueId } / myPlayers - Gets MyPlayers from yahoo by leagueId
+GET / yahoo / league / commissioner / all - Gets user Leagues of which a user is a commissioner by season
+GET / yahoo / league / { leagueId } / players - Gets all Players from yahoo by leagueId
+GET / yahoo / league / { leagueId } / team / { teamId } / players - Gets Player details from yahoo by leagueId and teamId
+
+
+
+SCAD League APIs
+
+// GET / scad / league / { id } - Get League from SCAD by id
+// POST / scad / league - Create a new SCAD League resource
+// PUT / scad / league / { id } - Update a SCAD League resource
+// DELETE / scad / league / { id } - Delete a SCAD League resource
+GET / scad / league /default -       Get default user League from SCAD by season
+PUT / scad / league /default /update​/{ id } -       Update a SCAD League default indicator for specified Id
+GET / scad / league / yahoo / { leagueId } - Get League from SCAD by yahoo leagueId
+// GET / scad / league / all - Get user Leagues from SCAD by season
+
+
+
+SCAD League Team APIs
+
+// GET / scad / team / { id } - Get specific Team from SCAD by id
+// POST / scad / team - Create a new Team resource
+// PUT / scad / team / { id } - Update a Team resource
+// DELETE / scad / team / { id } - Delete a Team resource
+// GET / scad / league / { scadLeagueId } / team / all - Gets all Teams from SCAD by scadLeagueId
+// GET / scad / league / yahoo / { leagueId } / team / all - Gets all Teams from SCAD by yahoo leagueId
+GET / scad / league / yahoo / { leagueId } / team / myTeam - Get MyTeam from SCAD by yahoo leagueId
+GET / scad / league / { scadLeagueId } / team / myTeam - Get MyTeam from SCAD by scadLeagueId
+
+// These don't make sense..
+// GET / scad / league / { scadLeagueId } / team / { id } - Get Team from SCAD by scadLeagueId and id
+
+
+
+SCAD League Player APIs
+
+// POST / scad / player - Create a new SCAD League Player resource
+// GET / scad / player / { id } - Get specific Player from SCAD by id
+// PUT / scad / player / { id } - Update a SCAD League Player resource
+// DELETE / scad / player / { id } - Delete a SCAD League Player resource
+// GET / scad / league / { scadLeagueId } / player / all - Get all Players from SCAD by scadLeagueId
+// GET / scad / league / yahoo / { leagueId } / player / all - Gets all Players from SCAD by yahoo leagueId
+GET / scad / league / { scadLeagueId } / player / myPlayers - Gets MyPlayers from SCAD by scadLeagueId
+GET / scad / league / yahoo / { leagueId } / player / myPlayers - Gets MyPlayers from SCAD by yahoo leagueId
+
+//These are mapped out, but are incomplete.  Need to figure out how to get specific team players
+GET / scad / league / { scadLeagueId } / team / { scadTeamId } / players - Gets Players from SCAD by scadLeagueId and scadTeamId
+GET / scad / league / yahoo / { leagueId } / team / { teamId } / players - Gets Players from SCAD by yahoo leagueId and teamId
+
+// These don't make sense..
+// GET / scad / league / { scadLeagueId } / player / { id } - Get Player from SCAD by scadLeagueId and id
+// GET / scad / league / yahoo / { leagueId } / player / { playerId } - Get Player from SCAD by yahoo leagueId and playerId
+// GET / scad / league / yahoo / { leagueId } / team / { teamId } - Get Team from SCAD by yahoo leagueId and teamId

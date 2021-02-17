@@ -9,7 +9,6 @@ scadTeamRouter.get('/:id', scadAuth(), getById)
 scadTeamRouter.put('/:id', scadAuth(), update)
 scadTeamRouter.post('/', scadAuth(), create)
 scadTeamRouter.delete('/:id', scadAuth(), remove)
-scadTeamRouter.get('/all', scadAuth(), getAll)
 
 module.exports = scadTeamRouter
 
@@ -64,18 +63,5 @@ function remove(req, res) {
   } catch (error) {
     debug(error)
     res.status(500).send('An Error Occured Removing Scad Team')
-  }
-}
-
-async function getAll(req, res) {
-  debug('getAll')
-  try {
-    const result = await scadTeam.getAll()
-    res.json({
-      scadTeams: result,
-    })
-  } catch (error) {
-    debug(error)
-    res.status(500).send('An Error Occured Retrieving Scad Team')
   }
 }

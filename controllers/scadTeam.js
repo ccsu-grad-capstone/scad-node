@@ -2,14 +2,20 @@ const debug = require('debug')('app:ScadTeamController')
 const moment = require('moment')
 const ScadTeam = require('../models/ScadTeam')
 
-async function getAll() {
-  debug('Getting all ScadTeams')
-  return await ScadTeam.find()
-}
 
 async function getById(id) {
   debug('Getting ScadTeam by id: ')
   return await ScadTeam.findById(id)
+}
+
+async function getAllByScadLeagueId(id) {
+  debug('Getting all ScadTeams for scadLeagueId', id)
+  return await ScadTeam.find({ scadLeagueId: id })
+}
+
+async function getAllByYahooLeagueId(id) {
+  debug('Getting all ScadTeams by yahooLeagueId', id)
+  return await ScadTeam.find({ yahooLeagueId: id })
 }
 
 async function create(scadTeam) {
@@ -38,4 +44,4 @@ async function remove(id) {
   return await ScadTeam.findByIdAndRemove(id).exec()
 }
 
-module.exports = { getAll, getById, create, update, remove }
+module.exports = { getById, getAllByScadLeagueId, getAllByYahooLeagueId, create, update, remove }
