@@ -1,11 +1,9 @@
 const debug = require('debug')('app:scadLeagueController')
 const moment = require('moment')
 const ScadLeague = require('../models/ScadLeague')
-
-async function getAll() {
-  debug('Getting all ScadLeagues')
-  return await ScadLeague.find()
-}
+const scadTeamController = require('./scadTeam')
+const scadPlayerController = require('./scadPlayer')
+const yf = require('../services/yahooFantasy')
 
 async function getById(id) {
   debug('Getting ScadLeague by id: ')
@@ -14,17 +12,63 @@ async function getById(id) {
 
 async function getByYahooLeagueId(yahooLeagueId) {
   debug('Getting ScadLeague by yahooLeagueId: ')
-  return await ScadLeague.find({yahooLeagueId: yahooLeagueId})
+  return await ScadLeague.findOne({ yahooLeagueId: yahooLeagueId })
 }
 
-async function create(scadLeague) {
-  debug('Creating new ScadLeague')
-  const league = new ScadLeague(scadLeague)
+async function create(scadLeague, access_token) {
+  try {
+    debug('Creating new ScadLeague')
 
-  league.created = moment().format()
-  league.updated = moment().format()
+    // Check if SCAD league already exists for YahooLeagueId
 
-  await league.save()
+    if (await ScadLeague.findOne({yahooLeagueId: scadLeague.yahooLeagueId})) {
+      throw ('It appears a SCAD league already exists for this Yahoo League. ')
+    }
+
+    // Create and save SCAD league to db
+    const newScadLeague = new ScadLeague(scadLeague)
+    newScadLeague.created = moment().format()
+    newScadLeague.updated = moment().format()
+    await newScadLeague.save()
+
+    const yahooTeams = await yf.getLeagueTeams(access_token, scadLeague.yahooLeagueId)
+    const yahooLeaguePlayers = await yf.getAllLeaguePlayers(access_token, scadLeague.yahooLeagueId)
+
+    // For each Yahoo Team, create a SCAD team..
+    for (const yt of yahooTeams) {
+      let st = {
+        yahooTeamId: yt.team_id,
+        yahooLeagueId: scadLeague.yahooLeagueId,
+        scadLeagueId: newScadLeague._id,
+        salary: 0,
+        isFranchiseTag: false,
+        exceptionIn: 0,
+        exceptionOut: 0,
+      }
+      await scadTeamController.create(st)
+    }
+    debug('Finished creating SCAD teams')
+
+    // For each Yahoo Player, create a SCAD player..
+    for (const yp of yahooLeaguePlayers) {
+      let sp = {
+        yahooPlayerId: yp.player_id,
+        yahooLeagueId: scadLeague.yahooLeagueId,
+        scadLeagueId: newScadLeague._id,
+        salary: 0,
+        isFranchiseTag: false,
+        previousYearSalary: 0,
+      }
+      await scadPlayerController.create(sp)
+    }
+    debug('Finished creating SCAD players')
+  } catch (error) {
+    if (error.includes('already exists')) {
+      throw (error)
+    } else {
+      throw('An Error Occured Creating Scad League')
+    }
+  }
 }
 
 async function update(id, scadLeague) {
@@ -41,6 +85,11 @@ async function update(id, scadLeague) {
 async function remove(id) {
   debug('Removing ScadLeague: ', id)
   return await ScadLeague.findByIdAndRemove(id).exec()
+}
+
+async function getAll() {
+  debug('Getting all ScadLeagues')
+  return await ScadLeague.find()
 }
 
 // INCOMPLETE

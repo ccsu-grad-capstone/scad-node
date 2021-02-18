@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
 const schema = new Schema({
-  yahooGameId: { type: String, required: true },
+  yahooGameId: { type: String },
 	yahooLeagueId: { type: String, required: true },
 	seasonYear: { type: Number, required: true },
 	leagueManagers: { type: Number, required: true },
@@ -32,6 +32,8 @@ const schema = new Schema({
 	ownerGuid: { type: String },
 	renewSCADLeagueId: { type: String },
 	rosterSpotLimit: { type: Number, required: true },
+  updated: { type: String },
+  created: { type: String }
 })
 
 module.exports = mongoose.model("ScadLeague", schema)

@@ -45,12 +45,16 @@ function update(req, res) {
   const { id } = req.params
   const player = req.body.data
   debug('update')
-  try {
-    scadPlayer.update(id, player)
-    res.send('Scad Player updated successfully')
-  } catch (error) {
-    debug(error)
-    res.status(500).send('An Error Occured Updating Scad Player')
+  if (player) {
+    try {
+      scadPlayer.update(id, player)
+      res.send('Scad Player updated successfully')
+    } catch (error) {
+      debug(error)
+      res.status(500).send('An Error Occured Updating Scad Player')
+    }
+  } else {
+    res.status(500).send('No Scad Player supplied with request.')
   }
 }
 

@@ -2,12 +2,17 @@ const debug = require('debug')('app:ScadPlayerController')
 const moment = require('moment')
 const ScadPlayer = require('../models/ScadPlayer')
 const scadLeagueController = require('./scadLeague')
+const scadTeamController = require('./scadTeam')
 const yf = require('../services/yahooFantasy')
 const ScadLeague = require('../models/ScadLeague')
 
 async function getById(id) {
   debug('Getting ScadPlayer by id: ')
   return await ScadPlayer.findById(id)
+}
+
+async function getByYahooIds(yahooLeagueId, yahooPlayerId) {
+  return await ScadPlayer.find({ yahooPlayerId: yahooPlayerId, yahooLeagueId: yahooLeagueId })
 }
 
 async function getAllByScadLeagueId(id) {
@@ -39,20 +44,31 @@ async function getMyPlayersByYahooId(yahooLeagueId) {
   return 
 }
 
-//INCOMPLETE
-async function getAllForTeamByScadIds(scadLeagueId, scadTeamId) {
-  debug('Getting all ScadPlayers for team by scad ids', scadLeagueId)
-  return await ScadPlayer.find({ scadLeagueId: scadLeagueId })
+async function getAllTeamPlayersByScadTeamId(scadTeamId, access_token) {
+  debug('Getting all ScadPlayers for team by scad ids')
+
+  let scadTeam = await scadTeamController.getById(scadTeamId)
+  const yt = await yf.getTeamWithRoster(access_token, scadTeam.yahooLeagueId, scadTeam.yahooTeamId)
+
+  let scadPlayers = []
+  for (const yp of yt.roster) {
+    scadPlayers.push(await getByYahooIds(scadTeam.yahooLeagueId, yp.player_id))
+  }
+  
+  return scadPlayers
 }
 
-//INCOMPLETE
-async function getAllForTeamByYahooIds(yahooLeagueId, yahooTeamId) {
+async function getAllForTeamByYahooIds(yahooLeagueId, yahooTeamId, access_token) {
   debug('Getting all ScadPlayers for league by yahooLeagueId', yahooLeagueId)
 
-  let scadPlayers = await ScadPlayer.find({ yahooLeagueId: yahooLeagueId })
+  const yt = await yf.getTeamWithRoster(access_token, yahooLeagueId, yahooTeamId)
 
+  let scadPlayers = []
+  for (const yp of yt.roster) {
+    scadPlayers.push(await getByYahooIds(yahooLeagueId, yp.player_id))
+  }
 
-  return 
+  return scadPlayers
 }
 
 async function create(scadPlayer) {
@@ -87,7 +103,7 @@ module.exports = {
   getAllByYahooLeagueId,
   getMyPlayersByScadId,
   getMyPlayersByYahooId,
-  getAllForTeamByScadIds,
+  getAllTeamPlayersByScadTeamId,
   getAllForTeamByYahooIds,
   create,
   update,

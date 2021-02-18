@@ -1,5 +1,6 @@
 const express = require('express')
 const scadTeam = require('../controllers/scadTeam')
+const scadPlayer = require('../controllers/scadPlayer')
 const debug = require('debug')('app:scadTeamRouter')
 const scadAuth = require('../utilities/scadAuth')
 
@@ -9,6 +10,9 @@ scadTeamRouter.get('/:id', scadAuth(), getById)
 scadTeamRouter.put('/:id', scadAuth(), update)
 scadTeamRouter.post('/', scadAuth(), create)
 scadTeamRouter.delete('/:id', scadAuth(), remove)
+
+// ----- Returning Scad Players -----
+scadTeamRouter.get('/:id/players', scadAuth(), getAllTeamPlayersByScadTeamId)
 
 module.exports = scadTeamRouter
 
@@ -63,5 +67,20 @@ function remove(req, res) {
   } catch (error) {
     debug(error)
     res.status(500).send('An Error Occured Removing Scad Team')
+  }
+}
+
+async function getAllTeamPlayersByScadTeamId(req, res) {
+  const { id } = req.params
+  const { access_token } = req.headers
+  debug(id)
+  try {
+    const result = await scadPlayer.getAllTeamPlayersByScadTeamId(id, access_token)
+    res.json({
+      scadPlayers: result,
+    })
+  } catch (error) {
+    debug(error)
+    res.status(500).send('An Error Occured Retrieving Scad Players')
   }
 }

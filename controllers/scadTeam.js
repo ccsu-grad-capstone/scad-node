@@ -3,10 +3,14 @@ const moment = require('moment')
 const ScadTeam = require('../models/ScadTeam')
 const yf = require('../services/yahooFantasy')
 
-
 async function getById(id) {
   debug('Getting ScadTeam by id: ')
   return await ScadTeam.findById(id)
+}
+
+async function getByYahooIds(yahooLeagueId, yahooTeamId) {
+  debug('Getting ScadTeam by YahooIds: ')
+  return await ScadTeam.find({ yahooLeagueId: yahooLeagueId, yahooTeamId: yahooTeamId })
 }
 
 async function getAllByScadLeagueId(id) {
@@ -19,24 +23,23 @@ async function getAllByYahooLeagueId(id) {
   return await ScadTeam.find({ yahooLeagueId: id })
 }
 
-async function geMyTeamByScadLeagueId(id, access_token) {
+async function getMyTeamByScadLeagueId(id, access_token) {
   debug('Getting my ScadTeam for scadLeagueId', id)
-  
+
   const scadLeagueTeams = await getAllByScadLeagueId(id)
-  const myYahooTeams = yt.getMyTeams(access_token)
+  const myYahooTeams = await yf.getMyTeams(access_token)
 
-  let yahooTeam = myYahooTeams.find(yt => yt.league_id === scadTeams[0].yahooLeagueId)
-
-  return scadLeagueTeams.find(st => st.yahooTeamId === yahooTeam.team_id)
+  let yahooTeam = myYahooTeams.find((yt) => yt.team_key.includes(scadLeagueTeams[0].yahooLeagueId))
+  return scadLeagueTeams.find((st) => st.yahooTeamId === yahooTeam.team_id)
 }
 
-async function geMyTeamByYahooLeagueId(yahooLeagueId, access_token) {
+async function getMyTeamByYahooLeagueId(yahooLeagueId, access_token) {
   debug('Getting my ScadTeam for yahooLeagueId', yahooLeagueId)
 
   const scadLeagueTeams = await getAllByYahooLeagueId(yahooLeagueId)
-  const myYahooTeam = yt.getMyTeam(access_token, yahooLeagueId)
+  const myYahooTeam = await yf.getMyTeam(access_token, yahooLeagueId)
 
-  return scadLeagueTeams.find(st => st.yahooTeamId === myYahooTeam.team_id)
+  return scadLeagueTeams.find((st) => st.yahooTeamId === myYahooTeam.team_id)
 }
 
 async function create(scadTeam) {
@@ -65,4 +68,14 @@ async function remove(id) {
   return await ScadTeam.findByIdAndRemove(id).exec()
 }
 
-module.exports = { getById, getAllByScadLeagueId, getAllByYahooLeagueId, geMyTeamByScadLeagueId, geMyTeamByYahooLeagueId, create, update, remove }
+module.exports = {
+  getById,
+  getByYahooIds,
+  getAllByScadLeagueId,
+  getAllByYahooLeagueId,
+  getMyTeamByScadLeagueId,
+  getMyTeamByYahooLeagueId,
+  create,
+  update,
+  remove,
+}

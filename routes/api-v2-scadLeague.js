@@ -13,7 +13,7 @@ scadLeagueRouter.get('/yahoo/:yahooLeagueId', scadAuth(), getByYahooLeagueId)
 scadLeagueRouter.put('/:id', scadAuth(), update)
 scadLeagueRouter.post('/', scadAuth(), create)
 scadLeagueRouter.delete('/:id', scadAuth(), remove)
-scadLeagueRouter.get('/all', scadAuth(), getAll)
+scadLeagueRouter.get('/get/all', scadAuth(), getAll)
 // INCOMPLETE - Default League
 scadLeagueRouter.get('/default', scadAuth(), getDefaultLeague)
 scadLeagueRouter.put('/default/update/:id', scadAuth(), updateDefaultLeague)
@@ -27,18 +27,17 @@ scadLeagueRouter.get('/yahoo/:yahooLeagueId/team/myTeam', scadAuth(), getMyTeamB
 // ----- Returning Scad Players -----
 scadLeagueRouter.get('/:id/player/all', scadAuth(), getAllPlayersByScadLeagueId)
 scadLeagueRouter.get('/yahoo/:yahooLeagueId/player/all', scadAuth(), getAllPlayersByYahooLeagueId)
+scadLeagueRouter.get('/yahoo/:yahooLeagueId/team/:yahooTeamId/players', scadAuth(), getAllTeamPlayersByYahooIds)
 // INCOMPLETE
-scadLeagueRouter.get('/:id/players/myPlayers', scadAuth(), getMyTeamPlayersByScadIds)
-scadLeagueRouter.get('/yahoo/:yahooLeagueId/player/myPlayers', scadAuth(), getMyTeamPlayersByYahooIds)
-scadLeagueRouter.get('/:id/team/:scadTeamId/players', scadAuth(), getAllTeamPlayersByScadIds)
-scadLeagueRouter.get('/yahoo/:yahooLeagueId/team/yahooTeamId/players', scadAuth(), getAllTeamPlayersByYahooIds)
+scadLeagueRouter.get('/:id/players/myPlayers', scadAuth(), getMyPlayersByScadId)
+scadLeagueRouter.get('/yahoo/:yahooLeagueId/player/myPlayers', scadAuth(), getMyPlayersByYahooId)
 
 module.exports = scadLeagueRouter
 
 // ----- Returning Scad Leagues -----
 async function getById(req, res) {
   const { id } = req.params
-  debug(id)
+  debug('getById', id)
   try {
     const result = await scadLeague.getById(id)
     res.json({
@@ -52,7 +51,7 @@ async function getById(req, res) {
 
 async function getByYahooLeagueId(req, res) {
   const { yahooLeagueId } = req.params
-  debug(yahooLeagueId)
+  debug('getByYahooLeagueId', yahooLeagueId)
   try {
     const result = await scadLeague.getByYahooLeagueId(yahooLeagueId)
     res.json({
@@ -64,15 +63,17 @@ async function getByYahooLeagueId(req, res) {
   }
 }
 
-function create(req, res) {
+async function create(req, res) {
+  debug('create')
   const league = req.body.data
+  const { access_token } = req.headers
   if (league) {
     try {
-      scadLeague.create(league)
+      await scadLeague.create(league, access_token)
       res.send('Scad League Created successfully')
     } catch (error) {
       debug(error)
-      res.status(500).send('An Error Occured Updating Scad League')
+      res.status(500).send(error)
     }
   } else {
     res.status(500).send('No Scad League supplied with request.')
@@ -80,6 +81,7 @@ function create(req, res) {
 }
 
 function update(req, res) {
+  debug('update')
   const { id } = req.params
   const league = req.body.data
   debug('update')
@@ -93,6 +95,7 @@ function update(req, res) {
 }
 
 function remove(req, res) {
+  debug('remove')
   const { id } = req.params
   debug('remove')
   try {
@@ -175,12 +178,12 @@ async function getAllTeamsByYahooLeagueId(req, res) {
   }
 }
 
-// Need to bring in access_tokenn..
 async function getMyTeamByScadLeagueId(req, res) {
   const { id } = req.params
+  const { access_token} = req.headers
   debug(id)
   try {
-    const result = await scadTeam.getMyTeamByScadLeagueId(id, access_tokenn)
+    const result = await scadTeam.getMyTeamByScadLeagueId(id, access_token)
     res.json({
       myTeam: result,
     })
@@ -189,12 +192,13 @@ async function getMyTeamByScadLeagueId(req, res) {
     res.status(500).send('An Error Occured Retrieving Scad Teams')
   }
 }
-// Need to bring in access_tokenn..
+
 async function getMyTeamByYahooLeagueId(req, res) {
   const { yahooLeagueId } = req.params
+  const { access_token} = req.headers
   debug(yahooLeagueId)
   try {
-    const result = await scadTeam.getMyTeamByYahooLeagueId(yahooLeagueId, access_tokenn)
+    const result = await scadTeam.getMyTeamByYahooLeagueId(yahooLeagueId, access_token)
     res.json({
       myTeam: result,
     })
@@ -235,7 +239,7 @@ async function getAllPlayersByYahooLeagueId(req, res) {
 }
 
 // INCOMPLETE
-async function getMyTeamPlayersByScadIds(req, res) {
+async function getMyPlayersByScadId(req, res) {
   const { id } = req.params
   debug(id, scadTeamId)
   try {
@@ -250,7 +254,7 @@ async function getMyTeamPlayersByScadIds(req, res) {
 }
 
 // INCOMPLETE
-async function getMyTeamPlayersByYahooIds(req, res) {
+async function getMyPlayersByYahooId(req, res) {
   const { yahooLeagueId } = req.params
   debug(yahooLeagueId)
   try {
@@ -264,27 +268,12 @@ async function getMyTeamPlayersByYahooIds(req, res) {
   }
 }
 
-// INCOMPLETE
-async function getAllTeamPlayersByScadIds(req, res) {
-  const { id, scadTeamId } = req.params
-  debug(id, scadTeamId)
-  try {
-    const result = await scadPlayer.getAllForTeamByScadIds(id, scadTeamId)
-    res.json({
-      scadPlayers: result,
-    })
-  } catch (error) {
-    debug(error)
-    res.status(500).send('An Error Occured Retrieving Scad Players')
-  }
-}
-
-// INCOMPLETE
 async function getAllTeamPlayersByYahooIds(req, res) {
-  const { yahooLeagueId } = req.params
-  debug(yahooLeagueId)
+  const { yahooLeagueId, yahooTeamId } = req.params
+  const { access_token } = req.headers
+  debug(getAllTeamPlayersByYahooIds)
   try {
-    const result = await scadPlayer.getAllByYahooLeagueId(yahooLeagueId)
+    const result = await scadPlayer.getAllForTeamByYahooIds(yahooLeagueId, yahooTeamId, access_token)
     res.json({
       scadPlayers: result,
     })
