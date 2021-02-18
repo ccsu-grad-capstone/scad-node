@@ -5,17 +5,17 @@ const scadAuth = require('../utilities/scadAuth')
 
 const playerRouter = express.Router()
 
-playerRouter.get('/yahoo/:yahooLeagueId/:accessToken', getYahooPlayers)
+playerRouter.get('/yahoo/:yahooLeagueId/:access_token', getYahooPlayers)
 
 module.exports = playerRouter
 
 playerRouter.use(scadAuth)
 
 async function getYahooPlayers(req, res) {
-  const { accessToken, yahooLeagueId } = req.params
-  // debug(accessToken, yahooLeagueId)
+  const { access_token, yahooLeagueId } = req.params
+  // debug(access_token, yahooLeagueId)
   try {
-    let result = await yf.getPlayers(accessToken, yahooLeagueId)
+    let result = await yf.getPlayers(access_token, yahooLeagueId)
     res.json({
       players: result,
     })

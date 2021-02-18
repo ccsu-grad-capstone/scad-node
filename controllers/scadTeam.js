@@ -1,6 +1,7 @@
 const debug = require('debug')('app:ScadTeamController')
 const moment = require('moment')
 const ScadTeam = require('../models/ScadTeam')
+const yf = require('../services/yahooFantasy')
 
 
 async function getById(id) {
@@ -16,6 +17,26 @@ async function getAllByScadLeagueId(id) {
 async function getAllByYahooLeagueId(id) {
   debug('Getting all ScadTeams by yahooLeagueId', id)
   return await ScadTeam.find({ yahooLeagueId: id })
+}
+
+async function geMyTeamByScadLeagueId(id, access_token) {
+  debug('Getting my ScadTeam for scadLeagueId', id)
+  
+  const scadLeagueTeams = await getAllByScadLeagueId(id)
+  const myYahooTeams = yt.getMyTeams(access_token)
+
+  let yahooTeam = myYahooTeams.find(yt => yt.league_id === scadTeams[0].yahooLeagueId)
+
+  return scadLeagueTeams.find(st => st.yahooTeamId === yahooTeam.team_id)
+}
+
+async function geMyTeamByYahooLeagueId(yahooLeagueId, access_token) {
+  debug('Getting my ScadTeam for yahooLeagueId', yahooLeagueId)
+
+  const scadLeagueTeams = await getAllByYahooLeagueId(yahooLeagueId)
+  const myYahooTeam = yt.getMyTeam(access_token, yahooLeagueId)
+
+  return scadLeagueTeams.find(st => st.yahooTeamId === myYahooTeam.team_id)
 }
 
 async function create(scadTeam) {
@@ -44,4 +65,4 @@ async function remove(id) {
   return await ScadTeam.findByIdAndRemove(id).exec()
 }
 
-module.exports = { getById, getAllByScadLeagueId, getAllByYahooLeagueId, create, update, remove }
+module.exports = { getById, getAllByScadLeagueId, getAllByYahooLeagueId, geMyTeamByScadLeagueId, geMyTeamByYahooLeagueId, create, update, remove }

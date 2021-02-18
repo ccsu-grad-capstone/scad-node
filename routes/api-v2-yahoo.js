@@ -6,149 +6,181 @@ const scadAuth = require('../utilities/scadAuth')
 const yahooRouter = express.Router()
 
 // Already in LAMBDAS
-yahooRouter.get('/myTeams/:accessToken', scadAuth(), getMyTeams)
-yahooRouter.get('/league/:yahooLeagueId/myTeam/:accessToken', scadAuth(), getMyTeam)
-yahooRouter.get('/league/:yahooLeagueId/:accessToken', scadAuth(), getLeagueMeta)
-yahooRouter.get('/league/:yahooLeagueId/settings/:accessToken', scadAuth(), getLeagueSettings)
-yahooRouter.get('/league/:yahooLeagueId/standings/:accessToken', scadAuth(), getLeagueStandings)
-yahooRouter.get('/league/:yahooLeagueId/teams/:accessToken', scadAuth(), getLeagueTeams)
-yahooRouter.get('/league/all/:accessToken', scadAuth(), getAllUsersLeagues)
-yahooRouter.get('/league/:yahooLeagueId/transactions/:accessToken', scadAuth(), getLeagueTransactions)
-yahooRouter.get('/league/:yahooLeagueId/team/:yahooTeamId/roster/:accessToken', scadAuth(), getRoster)
+yahooRouter.get('/myTeams', scadAuth(), getMyTeams)
+yahooRouter.get('/league/:yahooLeagueId/myTeam', scadAuth(), getMyTeam)
+yahooRouter.get('/league/:yahooLeagueId', scadAuth(), getLeagueMeta)
+yahooRouter.get('/league/:yahooLeagueId/settings', scadAuth(), getLeagueSettings)
+yahooRouter.get('/league/:yahooLeagueId/standings', scadAuth(), getLeagueStandings)
+yahooRouter.get('/league/:yahooLeagueId/teams', scadAuth(), getLeagueTeams)
+yahooRouter.get('/league/team/all', scadAuth(), getAllUsersLeagues)
+yahooRouter.get('/league/:yahooLeagueId/transactions', scadAuth(), getLeagueTransactions)
+yahooRouter.get('/league/:yahooLeagueId/team/:yahooTeamId/roster', scadAuth(), getTeamWithRoster)
 
 // Need to add to LAMBDAS
-yahooRouter.get('/game/:accessToken', scadAuth(), getGames)
+yahooRouter.get('/game', scadAuth(), getGames)
+yahooRouter.get('/league/commissioner/all', scadAuth(), getAllCommishLeagues)
+yahooRouter.get('/league/:yahooLeagueId/players', scadAuth(), getAllLeaguePlayers)
 
 module.exports = yahooRouter
 
 async function getMyTeams(req, res) {
-  const { accessToken } = req.params
+  const { access_token } = req.headers
   try {
-    let result = await yf.getMyTeams(accessToken)
+    let result = await yf.getMyTeams(access_token)
     res.json({
-      myTeams: result.teams[0].teams,
+      myTeams: result,
     })
   } catch (error) {
     debug(error)
-    res.status(500).send('An Error Occured Retrieving MyTeams')
+    res.status(500).send(error)
   }
 }
 
 async function getMyTeam(req, res) {
-  const { accessToken, yahooLeagueId } = req.params
+  const { yahooLeagueId } = req.params
+  const { access_token } = req.headers
   try {
-    let result = await yf.getMyTeam(accessToken, yahooLeagueId)
+    let result = await yf.getMyTeam(access_token, yahooLeagueId)
     res.json({
       myTeam: result
     })
   } catch (error) {
     debug(error)
-    res.status(500).send('An Error Occured Retrieving MyTeam')
+    res.status(500).send(error)
   }
 }
 
 async function getLeagueMeta(req, res) {
-  const { accessToken, yahooLeagueId } = req.params
+  const { yahooLeagueId } = req.params
+  const { access_token } = req.headers
   try {
-    let result = await yf.getLeagueMeta(accessToken, yahooLeagueId)
+    let result = await yf.getLeagueMeta(access_token, yahooLeagueId)
     res.json({
       league: result,
     })
   } catch (error) {
     debug(error)
-    res.status(500).send('An Error Occured Retrieving League Settings')
+    res.status(500).send(error)
   }
 }
 
 async function getLeagueSettings(req, res) {
-  const { accessToken, yahooLeagueId } = req.params
+  const { yahooLeagueId } = req.params
+  const { access_token } = req.headers
   try {
-    let result = await yf.getLeagueSettings(accessToken, yahooLeagueId)
+    let result = await yf.getLeagueSettings(access_token, yahooLeagueId)
     res.json({
-      settings: result.settings,
+      settings: result,
     })
   } catch (error) {
     debug(error)
-    res.status(500).send('An Error Occured Retrieving League Settings')
+    res.status(500).send(error)
   }
 }
 
 async function getLeagueStandings(req, res) {
-  const { accessToken, yahooLeagueId } = req.params
+  const { yahooLeagueId } = req.params
+  const { access_token } = req.headers
   try {
-    let result = await yf.getLeagueStandings(accessToken, yahooLeagueId)
+    let result = await yf.getLeagueStandings(access_token, yahooLeagueId)
     res.json({
-      standings: result.standings,
+      standings: result,
     })
   } catch (error) {
     debug(error)
-    res.status(500).send('An Error Occured Retrieving League Standings')
+    res.status(500).send(error)
   }
 }
 
 async function getLeagueTeams(req, res) {
-  const { accessToken, yahooLeagueId } = req.params
+  const { yahooLeagueId } = req.params
+  const { access_token } = req.headers
   try {
-    let result = await yf.getLeagueTeams(accessToken, yahooLeagueId)
+    let result = await yf.getLeagueTeams(access_token, yahooLeagueId)
     res.json({
-      teams: result.teams,
+      teams: result,
     })
   } catch (error) {
     debug(error)
-    res.status(500).send('An Error Occured Retrieving League Teams')
+    res.status(500).send(error)
   }
 }
 
 async function getAllUsersLeagues(req, res) {
-  const { accessToken, yahooLeagueId } = req.params
+  const { access_token } = req.headers
   try {
-    let result = await yf.getAllUsersLeagues(accessToken, yahooLeagueId)
+    let result = await yf.getAllUsersLeagues(access_token)
     res.json({
       leagues: result,
     })
   } catch (error) {
-    debug(error)
-    res.status(500).send('An Error Occured Retrieving League Players')
+    res.status(500).send(error)
   }
 }
 
 async function getLeagueTransactions(req, res) {
-  const { accessToken, yahooLeagueId } = req.params
+  const { yahooLeagueId } = req.params
+  const { access_token } = req.headers
   try {
-    let result = await yf.getLeagueTransactions(accessToken, yahooLeagueId)
+    let result = await yf.getLeagueTransactions(access_token, yahooLeagueId)
     res.json({
       transactions: result,
     })
   } catch (error) {
     debug(error)
-    res.status(500).send('An Error Occured Retrieving Transactions')
+    res.status(500).send(error)
   }
 }
 
-async function getRoster(req, res) {
-  const { accessToken, yahooLeagueId, yahooTeamId } = req.params
+async function getTeamWithRoster(req, res) {
+  const { yahooLeagueId, yahooTeamId } = req.params
+  const { access_token } = req.headers
   try {
-    let result = await yf.getRoster(accessToken, yahooLeagueId, yahooTeamId)
+    let result = await yf.getTeamWithRoster(access_token, yahooLeagueId, yahooTeamId)
     res.json({
-      roster: result.roster,
+      team: result,
     })
   } catch (error) {
     debug(error)
-    res.status(500).send('An Error Occured Retrieving Transactions')
+    res.status(500).send(error)
   }
 }
 
 // Need to add to LAMBDAS
-
 async function getGames(req, res) {
-  const { accessToken } = req.params
+  const { access_token } = req.headers
   try {
-    let result = await yf.getGameKey(accessToken)
+    let result = await yf.getGameKey(access_token)
     res.json({
       games: result,
     })
   } catch (error) {
     debug(error)
-    res.status(500).send('An Error Occured Retrieving Games')
+    res.status(500).send(error)
+  }
+}
+async function getAllCommishLeagues(req, res) {
+  const { access_token } = req.headers
+  try {
+    let result = await yf.getAllCommishLeagues(access_token)
+    res.json({
+      commishLeagues: result,
+    })
+  } catch (error) {
+    debug(error)
+    res.status(500).send(error)
+  }
+}
+async function getAllLeaguePlayers(req, res) {
+  const { yahooLeagueId } = req.params
+  const { access_token } = req.headers
+  try {
+    let result = await yf.getAllLeaguePlayers(access_token, yahooLeagueId)
+    res.json({
+      players: result,
+    })
+  } catch (error) {
+    debug(error)
+    res.status(500).send(error)
   }
 }

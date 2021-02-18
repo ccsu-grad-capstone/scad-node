@@ -12,6 +12,11 @@ async function getById(id) {
   return await ScadLeague.findById(id)
 }
 
+async function getByYahooLeagueId(yahooLeagueId) {
+  debug('Getting ScadLeague by yahooLeagueId: ')
+  return await ScadLeague.find({yahooLeagueId: yahooLeagueId})
+}
+
 async function create(scadLeague) {
   debug('Creating new ScadLeague')
   const league = new ScadLeague(scadLeague)
@@ -38,4 +43,16 @@ async function remove(id) {
   return await ScadLeague.findByIdAndRemove(id).exec()
 }
 
-module.exports = { getAll, getById, create, update, remove }
+// INCOMPLETE
+async function getDefault() {
+  debug('Getting default Scad League')
+  return await ScadLeague.find()
+}
+
+// INCOMPLETE
+async function updateDefault() {
+  debug('Update default Scad League')
+  return await ScadLeague.find()
+}
+
+module.exports = { getAll, getById, getByYahooLeagueId, create, update, remove, getDefault, updateDefault }

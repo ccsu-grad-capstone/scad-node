@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
 const schema = new Schema({
-	yahooLeagueTeamId: { type: String, required: true },
+	yahooTeamId: { type: String, required: true },
 	yahooLeagueId: { type: String, required: true },
 	scadLeagueId: { type: Schema.Types.ObjectId, ref: 'ScadLeague', required: true},
 	salary: { type: Number, required: true },

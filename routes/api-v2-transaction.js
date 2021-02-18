@@ -7,7 +7,7 @@ const scadAuth = require('../utilities/scadAuth')
 const transactionRouter = express.Router()
 
 transactionRouter.get('/:yahooLeagueId', scadAuth(), getTransaction)
-transactionRouter.get('/yahoo/:yahooLeagueId/:accessToken', scadAuth(), getYahooTransactions)
+transactionRouter.get('/yahoo/:yahooLeagueId/:access_token', scadAuth(), getYahooTransactions)
 transactionRouter.post('/create', scadAuth(), createTransaction)
 transactionRouter.put('/update/:id', scadAuth(), updateTransaction)
 transactionRouter.delete('/:id', scadAuth(), removeTransaction)
@@ -15,10 +15,10 @@ transactionRouter.delete('/:id', scadAuth(), removeTransaction)
 module.exports = transactionRouter
 
 async function getYahooTransactions(req, res) {
-  const { accessToken, yahooLeagueId } = req.params
-  // debug(accessToken, yahooLeagueId)
+  const { access_token, yahooLeagueId } = req.params
+  // debug(access_token, yahooLeagueId)
   try {
-    let result = await yf.getTransactions(accessToken, yahooLeagueId)
+    let result = await yf.getTransactions(access_token, yahooLeagueId)
     res.json({
       transactions: result,
     })

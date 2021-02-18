@@ -8,10 +8,10 @@ const GAMEKEY = '399'
 function yahooFantasy() {
 
   // Used to get players photos for PFF. 
-  async function getPlayers(accessToken, yahooLeagueId) {
+  async function getPlayers(access_token, yahooLeagueId) {
     try {
       var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
-      yf.setUserToken(accessToken)
+      yf.setUserToken(access_token)
       
       const start = [0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800, 825, 850, 875, 900, 925, 950, 975, 1000]
       let players = []

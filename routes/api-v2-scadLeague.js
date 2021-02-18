@@ -7,27 +7,54 @@ const scadAuth = require('../utilities/scadAuth')
 
 const scadLeagueRouter = express.Router()
 
+// ----- Returning Scad Leagues -----
 scadLeagueRouter.get('/:id', scadAuth(), getById)
+scadLeagueRouter.get('/yahoo/:yahooLeagueId', scadAuth(), getByYahooLeagueId)
 scadLeagueRouter.put('/:id', scadAuth(), update)
 scadLeagueRouter.post('/', scadAuth(), create)
 scadLeagueRouter.delete('/:id', scadAuth(), remove)
 scadLeagueRouter.get('/all', scadAuth(), getAll)
-//Returning Scad Teams..
+// INCOMPLETE - Default League
+scadLeagueRouter.get('/default', scadAuth(), getDefaultLeague)
+scadLeagueRouter.put('/default/update/:id', scadAuth(), updateDefaultLeague)
+
+// ----- Returning Scad Teams -----
 scadLeagueRouter.get('/:id/team/all', scadAuth(), getAllTeamsByScadLeagueId)
 scadLeagueRouter.get('/yahoo/:yahooLeagueId/team/all', scadAuth(), getAllTeamsByYahooLeagueId)
-//Returning Scad Players..
+scadLeagueRouter.get('/:id/team/myTeam', scadAuth(), getMyTeamByScadLeagueId)
+scadLeagueRouter.get('/yahoo/:yahooLeagueId/team/myTeam', scadAuth(), getMyTeamByYahooLeagueId)
+
+// ----- Returning Scad Players -----
 scadLeagueRouter.get('/:id/player/all', scadAuth(), getAllPlayersByScadLeagueId)
 scadLeagueRouter.get('/yahoo/:yahooLeagueId/player/all', scadAuth(), getAllPlayersByYahooLeagueId)
+// INCOMPLETE
+scadLeagueRouter.get('/:id/players/myPlayers', scadAuth(), getMyTeamPlayersByScadIds)
+scadLeagueRouter.get('/yahoo/:yahooLeagueId/player/myPlayers', scadAuth(), getMyTeamPlayersByYahooIds)
 scadLeagueRouter.get('/:id/team/:scadTeamId/players', scadAuth(), getAllTeamPlayersByScadIds)
 scadLeagueRouter.get('/yahoo/:yahooLeagueId/team/yahooTeamId/players', scadAuth(), getAllTeamPlayersByYahooIds)
 
 module.exports = scadLeagueRouter
 
+// ----- Returning Scad Leagues -----
 async function getById(req, res) {
   const { id } = req.params
   debug(id)
   try {
     const result = await scadLeague.getById(id)
+    res.json({
+      scadLeague: result,
+    })
+  } catch (error) {
+    debug(error)
+    res.status(500).send('An Error Occured Retrieving Scad League')
+  }
+}
+
+async function getByYahooLeagueId(req, res) {
+  const { yahooLeagueId } = req.params
+  debug(yahooLeagueId)
+  try {
+    const result = await scadLeague.getByYahooLeagueId(yahooLeagueId)
     res.json({
       scadLeague: result,
     })
@@ -90,6 +117,36 @@ async function getAll(req, res) {
   }
 }
 
+// INCOMPLETE
+async function getDefaultLeague(req, res) {
+  debug('getDefaultLeague')
+  try {
+    const result = await scadLeague.getDefault()
+    res.json({
+      scadLeague: result,
+    })
+  } catch (error) {
+    debug(error)
+    res.status(500).send('An Error Occured Retrieving Scad League')
+  }
+}
+
+// INCOMPLETE
+async function updateDefaultLeague(req, res) {
+  debug('updateDefaultLeague')
+  const { id } = req.params
+  try {
+    const result = await scadLeague.updateDefault(id)
+    res.send('Default SCAD league updated successfully')
+
+  } catch (error) {
+    debug(error)
+    res.status(500).send('An Error Occured Updating Default Scad League')
+  }
+}
+
+
+// ----- Returning Scad Teams -----
 async function getAllTeamsByScadLeagueId(req, res) {
   const { id } = req.params
   debug(id)
@@ -118,6 +175,37 @@ async function getAllTeamsByYahooLeagueId(req, res) {
   }
 }
 
+// Need to bring in access_tokenn..
+async function getMyTeamByScadLeagueId(req, res) {
+  const { id } = req.params
+  debug(id)
+  try {
+    const result = await scadTeam.getMyTeamByScadLeagueId(id, access_tokenn)
+    res.json({
+      myTeam: result,
+    })
+  } catch (error) {
+    debug(error)
+    res.status(500).send('An Error Occured Retrieving Scad Teams')
+  }
+}
+// Need to bring in access_tokenn..
+async function getMyTeamByYahooLeagueId(req, res) {
+  const { yahooLeagueId } = req.params
+  debug(yahooLeagueId)
+  try {
+    const result = await scadTeam.getMyTeamByYahooLeagueId(yahooLeagueId, access_tokenn)
+    res.json({
+      myTeam: result,
+    })
+  } catch (error) {
+    debug(error)
+    res.status(500).send('An Error Occured Retrieving Scad Teams')
+  }
+}
+
+
+// ----- Returning Scad Players -----
 async function getAllPlayersByScadLeagueId(req, res) {
   const { id } = req.params
   debug(id)
@@ -146,7 +234,37 @@ async function getAllPlayersByYahooLeagueId(req, res) {
   }
 }
 
-//INCOMPLETE
+// INCOMPLETE
+async function getMyTeamPlayersByScadIds(req, res) {
+  const { id } = req.params
+  debug(id, scadTeamId)
+  try {
+    const result = await scadPlayer.getMyPlayersByScadId(id)
+    res.json({
+      scadPlayers: result,
+    })
+  } catch (error) {
+    debug(error)
+    res.status(500).send('An Error Occured Retrieving Scad Players')
+  }
+}
+
+// INCOMPLETE
+async function getMyTeamPlayersByYahooIds(req, res) {
+  const { yahooLeagueId } = req.params
+  debug(yahooLeagueId)
+  try {
+    const result = await scadPlayer.getMyPlayersByYahooId(yahooLeagueId)
+    res.json({
+      scadPlayers: result,
+    })
+  } catch (error) {
+    debug(error)
+    res.status(500).send('An Error Occured Retrieving Scad Players')
+  }
+}
+
+// INCOMPLETE
 async function getAllTeamPlayersByScadIds(req, res) {
   const { id, scadTeamId } = req.params
   debug(id, scadTeamId)
@@ -157,11 +275,11 @@ async function getAllTeamPlayersByScadIds(req, res) {
     })
   } catch (error) {
     debug(error)
-    res.status(500).send('An Error Occured Retrieving Scad Teams')
+    res.status(500).send('An Error Occured Retrieving Scad Players')
   }
 }
 
-//INCOMPLETE
+// INCOMPLETE
 async function getAllTeamPlayersByYahooIds(req, res) {
   const { yahooLeagueId } = req.params
   debug(yahooLeagueId)
@@ -172,6 +290,6 @@ async function getAllTeamPlayersByYahooIds(req, res) {
     })
   } catch (error) {
     debug(error)
-    res.status(500).send('An Error Occured Retrieving Scad Teams')
+    res.status(500).send('An Error Occured Retrieving Scad Players')
   }
 }

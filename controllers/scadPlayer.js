@@ -1,6 +1,9 @@
 const debug = require('debug')('app:ScadPlayerController')
 const moment = require('moment')
 const ScadPlayer = require('../models/ScadPlayer')
+const scadLeagueController = require('./scadLeague')
+const yf = require('../services/yahooFantasy')
+const ScadLeague = require('../models/ScadLeague')
 
 async function getById(id) {
   debug('Getting ScadPlayer by id: ')
@@ -18,15 +21,38 @@ async function getAllByYahooLeagueId(id) {
 }
 
 //INCOMPLETE
+async function getMyPlayersByScadId(scadLeagueId, access_token) {
+  debug('Getting all ScadPlayers for my team by scad ids', scadLeagueId)
+  let scadLeague = scadLeagueController.getById(id)
+  let myYahooTeam = yf.getMyTeam(access_token, ScadLeague.yahooLeagueId)
+
+
+  return await ScadPlayer.find({ scadLeagueId: scadLeagueId })
+}
+
+//INCOMPLETE
+async function getMyPlayersByYahooId(yahooLeagueId) {
+  debug('Getting all ScadPlayers for my team by yahooLeagueId', yahooLeagueId)
+
+  let scadPlayers = await ScadPlayer.find({ yahooLeagueId: yahooLeagueId })
+
+  return 
+}
+
+//INCOMPLETE
 async function getAllForTeamByScadIds(scadLeagueId, scadTeamId) {
-  debug('Getting all ScadPlayers for team by scad ids', id)
-  return await ScadPlayer.find({ scadLeagueId: id })
+  debug('Getting all ScadPlayers for team by scad ids', scadLeagueId)
+  return await ScadPlayer.find({ scadLeagueId: scadLeagueId })
 }
 
 //INCOMPLETE
 async function getAllForTeamByYahooIds(yahooLeagueId, yahooTeamId) {
-  debug('Getting all ScadPlayers for league by yahooLeagueId', id)
-  return await ScadPlayer.find({ yahooLeagueId: id })
+  debug('Getting all ScadPlayers for league by yahooLeagueId', yahooLeagueId)
+
+  let scadPlayers = await ScadPlayer.find({ yahooLeagueId: yahooLeagueId })
+
+
+  return 
 }
 
 async function create(scadPlayer) {
@@ -59,6 +85,8 @@ module.exports = {
   getById,
   getAllByScadLeagueId,
   getAllByYahooLeagueId,
+  getMyPlayersByScadId,
+  getMyPlayersByYahooId,
   getAllForTeamByScadIds,
   getAllForTeamByYahooIds,
   create,
