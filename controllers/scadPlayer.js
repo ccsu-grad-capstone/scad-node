@@ -1,7 +1,6 @@
 const debug = require('debug')('app:ScadPlayerController')
 const moment = require('moment')
 const ScadPlayer = require('../models/ScadPlayer')
-const scadLeagueController = require('./scadLeague')
 const scadTeamController = require('./scadTeam')
 const yf = require('../services/yahooFantasy')
 const ScadLeague = require('../models/ScadLeague')
@@ -12,7 +11,7 @@ async function getById(id) {
 }
 
 async function getByYahooIds(yahooLeagueId, yahooPlayerId) {
-  return await ScadPlayer.find({ yahooPlayerId: yahooPlayerId, yahooLeagueId: yahooLeagueId })
+  return await ScadPlayer.findOne({ yahooPlayerId: yahooPlayerId, yahooLeagueId: yahooLeagueId })
 }
 
 async function getAllByScadLeagueId(id) {
@@ -25,23 +24,19 @@ async function getAllByYahooLeagueId(id) {
   return await ScadPlayer.find({ yahooLeagueId: id })
 }
 
-//INCOMPLETE
 async function getMyPlayersByScadId(scadLeagueId, access_token) {
   debug('Getting all ScadPlayers for my team by scad ids', scadLeagueId)
-  let scadLeague = scadLeagueController.getById(id)
-  let myYahooTeam = yf.getMyTeam(access_token, ScadLeague.yahooLeagueId)
 
-
-  return await ScadPlayer.find({ scadLeagueId: scadLeagueId })
+  let scadLeague = await ScadLeague.findById(scadLeagueId)
+  let myt = await yf.getMyTeam(access_token, scadLeague.yahooLeagueId)
+  return await getScadPlayersFromYahooTeam(myt, scadLeague.yahooLeagueId)
 }
 
-//INCOMPLETE
-async function getMyPlayersByYahooId(yahooLeagueId) {
+async function getMyPlayersByYahooId(yahooLeagueId, access_token) {
   debug('Getting all ScadPlayers for my team by yahooLeagueId', yahooLeagueId)
 
-  let scadPlayers = await ScadPlayer.find({ yahooLeagueId: yahooLeagueId })
-
-  return 
+  let myt = await yf.getMyTeam(access_token, yahooLeagueId)
+  return await getScadPlayersFromYahooTeam(myt, yahooLeagueId)
 }
 
 async function getAllTeamPlayersByScadTeamId(scadTeamId, access_token) {
@@ -50,12 +45,7 @@ async function getAllTeamPlayersByScadTeamId(scadTeamId, access_token) {
   let scadTeam = await scadTeamController.getById(scadTeamId)
   const yt = await yf.getTeamWithRoster(access_token, scadTeam.yahooLeagueId, scadTeam.yahooTeamId)
 
-  let scadPlayers = []
-  for (const yp of yt.roster) {
-    scadPlayers.push(await getByYahooIds(scadTeam.yahooLeagueId, yp.player_id))
-  }
-  
-  return scadPlayers
+  return await getScadPlayersFromYahooTeam(yt, scadTeam.yahooLeagueId)
 }
 
 async function getAllForTeamByYahooIds(yahooLeagueId, yahooTeamId, access_token) {
@@ -63,11 +53,15 @@ async function getAllForTeamByYahooIds(yahooLeagueId, yahooTeamId, access_token)
 
   const yt = await yf.getTeamWithRoster(access_token, yahooLeagueId, yahooTeamId)
 
+  return await getScadPlayersFromYahooTeam(yt, yahooLeagueId)
+}
+
+async function getScadPlayersFromYahooTeam(yahooTeam, yahooLeagueId) {
+  debug('getScadPlayersFromYahooTeam')
   let scadPlayers = []
-  for (const yp of yt.roster) {
+  for (const yp of yahooTeam.roster) {
     scadPlayers.push(await getByYahooIds(yahooLeagueId, yp.player_id))
   }
-
   return scadPlayers
 }
 
