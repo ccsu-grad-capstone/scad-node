@@ -1,12 +1,12 @@
 var YahooFantasy = require('yahoo-fantasy')
-const debug = require('debug')('app:yahooFantasy')
+const debug = require('debug')('app:yahooFantasyController')
 const { YAHOO_CLIENT_SECRET, YAHOO_CLIENT_ID } = require('../config')
 const fs = require('fs')
 const GAMEKEY = 'nfl'
 const GAMEKEYS = {
+  current: 'nfl',
   2020: '399',
   2019: '390',
-  2018: '380',
 }
 
 function yahooFantasy() {
@@ -20,7 +20,7 @@ function yahooFantasy() {
       return result
     } catch (error) {
       debug('ERR getGames', error)
-      throw (`Error connecting to Yahoo Fantasy`)
+      throw `Error connecting to Yahoo Fantasy`
     }
   }
 
@@ -31,19 +31,19 @@ function yahooFantasy() {
       yf.setUserToken(access_token)
 
       let result = await yf.user.game_leagues('nfl')
-      // debug(result)
-      if (result && checkIfLeagueExists(result.games[0].leagues, yahooLeagueId)) {
-        // debug('passed')
-        return 'nfl'
-      } else {
-        // debug('failed')
-        return '390'
-      }
+      // // debug(result)
+      // if (result && checkIfLeagueExists(result.games[0].leagues, yahooLeagueId)) {
+      //   // debug('passed')
+      //   return 'nfl'
+      // } else {
+      //   // debug('failed')
+      //   return '390'
+      // }
 
       return result
     } catch (error) {
       debug('ERR getGameKey', error)
-      throw (`Error connecting to Yahoo Fantasy`)
+      throw `Error connecting to Yahoo Fantasy`
     }
   }
 
@@ -52,6 +52,7 @@ function yahooFantasy() {
     return leagues.find((l) => l[0].league_id == id)
   }
 
+  // Lookup in SCADSERVICE
   async function getMyTeams(access_token) {
     debug('getMyTeams')
     try {
@@ -62,10 +63,11 @@ function yahooFantasy() {
       return result.teams[0].teams
     } catch (error) {
       debug('ERR getMyTeams', error)
-      throw (`Error connecting to Yahoo Fantasy`)
+      throw `Error connecting to Yahoo Fantasy`
     }
   }
 
+  // Lookup in SCADSERVICE
   async function getMyTeam(access_token, yahooLeagueId) {
     debug('getMyTeam')
     try {
@@ -74,10 +76,11 @@ function yahooFantasy() {
       return await getTeamWithRoster(access_token, yahooLeagueId, myTeam.team_id)
     } catch (error) {
       debug('ERR getMyTeam', error)
-      throw (`Error connecting to Yahoo Fantasy`)
+      throw `Error connecting to Yahoo Fantasy`
     }
   }
 
+  // Lookup in SCADSERVICE
   async function getLeagueMeta(access_token, yahooLeagueId) {
     debug('getLeagueMeta')
     try {
@@ -89,10 +92,11 @@ function yahooFantasy() {
       return result
     } catch (error) {
       debug('ERR getLeagueMeta', error)
-      throw (`Error connecting to Yahoo Fantasy`)
+      throw `Error connecting to Yahoo Fantasy`
     }
   }
 
+  // Lookup in SCADSERVICE
   async function getLeagueSettings(access_token, yahooLeagueId) {
     debug('getLeagueSettings')
     try {
@@ -103,10 +107,11 @@ function yahooFantasy() {
       return result.settings
     } catch (error) {
       debug('ERR getLeagueSettings', error)
-      throw (`Error connecting to Yahoo Fantasy`)
+      throw `Error connecting to Yahoo Fantasy`
     }
   }
 
+  // Lookup in SCADSERVICE
   async function getLeagueStandings(access_token, yahooLeagueId) {
     debug('getLeagueStandings')
     try {
@@ -117,10 +122,11 @@ function yahooFantasy() {
       return result.standings
     } catch (error) {
       debug('ERR getLeagueStandings', error)
-      throw (`Error connecting to Yahoo Fantasy`)
+      throw `Error connecting to Yahoo Fantasy`
     }
   }
 
+  // Lookup in SCADSERVICE
   async function getLeagueTeams(access_token, yahooLeagueId) {
     debug('getLeagueTeams')
     try {
@@ -131,25 +137,84 @@ function yahooFantasy() {
       return result.teams
     } catch (error) {
       debug('ERR getLeagueTeams', error)
-      throw (`Error connecting to Yahoo Fantasy`)
+      throw `Error connecting to Yahoo Fantasy`
     }
   }
 
-  async function getAllUsersLeagues(access_token) {
-    debug('getAllUsersLeagues')
+  async function getCurrentYahooGame(access_token) {
+    debug('getCurrentYahooSeason')
     try {
       var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
       yf.setUserToken(access_token)
 
-      let result = await yf.user.game_leagues(`${GAMEKEY}`)
-      let leagues = []
-      result.games[0].leagues.forEach((l) => {
-        leagues.push(l[0])
-      })
-      return leagues
+      let result = await yf.game.meta(GAMEKEY)
+
+      return result
     } catch (error) {
-      debug('ERR getAllUsersLeagues', error)
-      throw (`Error connecting to Yahoo Fantasy`)
+      debug('ERR getCurrentYahooSeason', error)
+      throw `Error connecting to Yahoo Fantasy`
+    }
+  }
+
+  async function getPreviousYahooGame(access_token, year) {
+    debug('getPreviousYahooGame')
+    try {
+      var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
+      yf.setUserToken(access_token)
+
+      let previousYear = parseInt(year) - 1
+      if (GAMEKEYS[previousYear]) {
+        let result = await yf.game.meta(GAMEKEYS[previousYear])
+        return result
+      } else {
+        throw 'Error Retrieving Previous Leagues'
+      }
+    } catch (error) {
+      debug('ERR getPreviousYahooGame', error)
+      throw `Error connecting to Yahoo Fantasy`
+    }
+  }
+
+  async function getUserLeaguesByCurrentSeason(access_token) {
+    debug('getUserLeaguesByCurrentSeason')
+    try {
+      let cs = await getCurrentYahooGame(access_token)
+      return await getUserLeaguesBySeason(access_token, cs.game_key, cs.season)
+    } catch (error) {
+      debug(error)
+    }
+  }
+
+  async function getUserLeaguesByPriorSeason(access_token, year) {
+    debug('getUserLeaguesByPriorSeason')
+
+    let ps = await getPreviousYahooGame(access_token, year)
+    return await getUserLeaguesBySeason(access_token, ps.game_key, ps.season)
+  }
+
+  async function getUserLeaguesBySeason(access_token, gameKey, year) {
+    debug('getUserLeaguesBySeason')
+    try {
+      var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
+      yf.setUserToken(access_token)
+
+      let result = await yf.user.game_leagues(gameKey)
+
+      // Return leagues if they existed, else try to get previous season's leagues
+      if (result.games[0].leagues.length > 0) {
+        return result.games[0].leagues
+      } else {
+        return await getUserLeaguesByPriorSeason(access_token, year)
+      }
+    } catch (error) {
+      // If Error contained the below, the idea is the Yahoo Fantasy API is in offseason
+      // If so, let's retrieve previous years leagues.
+      if (JSON.stringify(error).includes('There was a temporary problem with the server.')) {
+        return await getUserLeaguesByPriorSeason(access_token, year)
+      } else {
+        debug('ERR getUserLeaguesBySeason', error)
+        throw `Error connecting to Yahoo Fantasy`
+      }
     }
   }
 
@@ -164,10 +229,11 @@ function yahooFantasy() {
       return result
     } catch (error) {
       debug('ERR getLeagueTransactions', error)
-      throw (`Error connecting to Yahoo Fantasy`)
+      throw `Error connecting to Yahoo Fantasy`
     }
   }
 
+  // Lookup in SCADSERVICE
   async function getTeamWithRoster(access_token, yahooLeagueId, yahooTeamId) {
     debug('getTeamWithRoster')
     try {
@@ -178,10 +244,11 @@ function yahooFantasy() {
       return result
     } catch (error) {
       debug('ERR getTeamWithRoster', error)
-      throw (`Error connecting to Yahoo Fantasy`)
+      throw `Error connecting to Yahoo Fantasy`
     }
   }
 
+  // Lookup in SCADSERVICE
   async function getAllCommishLeagues(access_token) {
     debug('getAllCommishLeagues')
     try {
@@ -212,10 +279,11 @@ function yahooFantasy() {
       return commishLeagues
     } catch (error) {
       debug('ERR getAllCommishLeagues', error)
-      throw (`Error connecting to Yahoo Fantasy`)
+      throw `Error connecting to Yahoo Fantasy`
     }
   }
 
+  // Lookup in SCADSERVICE
   async function getAllLeaguePlayers(access_token, yahooLeagueId) {
     debug('getAllLeaguePlayers')
     try {
@@ -233,7 +301,7 @@ function yahooFantasy() {
       return players
     } catch (error) {
       debug('ERR getAllLeaguePlayers', error)
-      throw (`Error connecting to Yahoo Fantasy`)
+      throw `Error connecting to Yahoo Fantasy`
     }
   }
 
@@ -251,7 +319,10 @@ function yahooFantasy() {
     getLeagueSettings,
     getLeagueStandings,
     getLeagueTeams,
-    getAllUsersLeagues,
+    getCurrentYahooGame,
+    getPreviousYahooGame,
+    getUserLeaguesByCurrentSeason,
+    getUserLeaguesBySeason,
     getLeagueTransactions,
     getTeamWithRoster,
     getAllCommishLeagues,

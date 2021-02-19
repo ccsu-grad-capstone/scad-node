@@ -109,7 +109,7 @@ async function getLeagueTeams(req, res) {
 async function getAllUsersLeagues(req, res) {
   const { access_token } = req.headers
   try {
-    let result = await yf.getAllUsersLeagues(access_token)
+    let result = await yf.getUserLeaguesByCurrentSeason(access_token)
     res.json({
       leagues: result,
     })
