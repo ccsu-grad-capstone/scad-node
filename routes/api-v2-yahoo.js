@@ -26,7 +26,7 @@ module.exports = yahooRouter
 async function getMyTeams(req, res) {
   const { access_token } = req.headers
   try {
-    let result = await yf.getMyTeams(access_token)
+    let result = await yf.getMyCurrentSeasonTeams(access_token)
     res.json({
       myTeams: result,
     })
@@ -54,7 +54,7 @@ async function getLeagueMeta(req, res) {
   const { yahooLeagueId } = req.params
   const { access_token } = req.headers
   try {
-    let result = await yf.getLeagueMeta(access_token, yahooLeagueId)
+    let result = await yf.getCurrentSeasonLeagueDetails(access_token, 'meta', yahooLeagueId)
     res.json({
       league: result,
     })
@@ -68,7 +68,7 @@ async function getLeagueSettings(req, res) {
   const { yahooLeagueId } = req.params
   const { access_token } = req.headers
   try {
-    let result = await yf.getLeagueSettings(access_token, yahooLeagueId)
+    let result = await yf.getCurrentSeasonLeagueDetails(access_token, 'settings', yahooLeagueId)
     res.json({
       settings: result,
     })
@@ -82,7 +82,7 @@ async function getLeagueStandings(req, res) {
   const { yahooLeagueId } = req.params
   const { access_token } = req.headers
   try {
-    let result = await yf.getLeagueStandings(access_token, yahooLeagueId)
+    let result = await yf.getCurrentSeasonLeagueDetails(access_token, 'standings', yahooLeagueId)
     res.json({
       standings: result,
     })
@@ -96,7 +96,7 @@ async function getLeagueTeams(req, res) {
   const { yahooLeagueId } = req.params
   const { access_token } = req.headers
   try {
-    let result = await yf.getLeagueTeams(access_token, yahooLeagueId)
+    let result = await yf.getCurrentSeasonLeagueDetails(access_token, 'teams', yahooLeagueId)
     res.json({
       teams: result,
     })
@@ -122,7 +122,7 @@ async function getLeagueTransactions(req, res) {
   const { yahooLeagueId } = req.params
   const { access_token } = req.headers
   try {
-    let result = await yf.getLeagueTransactions(access_token, yahooLeagueId)
+    let result = await yf.getCurrentSeasonLeagueDetails(access_token, 'transactions', yahooLeagueId)
     res.json({
       transactions: result,
     })
@@ -136,7 +136,7 @@ async function getTeamWithRoster(req, res) {
   const { yahooLeagueId, yahooTeamId } = req.params
   const { access_token } = req.headers
   try {
-    let result = await yf.getTeamWithRoster(access_token, yahooLeagueId, yahooTeamId)
+    let result = await yf.getCurrentSeasonTeamWithRoster(access_token, yahooLeagueId, yahooTeamId)
     res.json({
       team: result,
     })

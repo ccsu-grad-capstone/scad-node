@@ -26,11 +26,11 @@ async function getById(req, res) {
   }
 }
 
-function create(req, res) {
+async function create(req, res) {
   const player = req.body.data
   if (player) {
     try {
-      scadPlayer.create(player)
+      await scadPlayer.create(player)
       res.send('Scad Player Created successfully')
     } catch (error) {
       debug(error)
@@ -41,13 +41,13 @@ function create(req, res) {
   }
 }
 
-function update(req, res) {
+async function update(req, res) {
   const { id } = req.params
   const player = req.body.data
   debug('update')
   if (player) {
     try {
-      scadPlayer.update(id, player)
+      await scadPlayer.update(id, player)
       res.send('Scad Player updated successfully')
     } catch (error) {
       debug(error)
@@ -58,11 +58,11 @@ function update(req, res) {
   }
 }
 
-function remove(req, res) {
+async function remove(req, res) {
   const { id } = req.params
   debug('remove')
   try {
-    scadPlayer.remove(id)
+    await scadPlayer.remove(id)
     res.send('Scad Player removed successfully')
   } catch (error) {
     debug(error)

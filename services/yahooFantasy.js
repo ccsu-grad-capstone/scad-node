@@ -2,7 +2,6 @@ var YahooFantasy = require('yahoo-fantasy')
 const debug = require('debug')('app:yahooFantasyController')
 const { YAHOO_CLIENT_SECRET, YAHOO_CLIENT_ID } = require('../config')
 const fs = require('fs')
-const GAMEKEY = 'nfl'
 const GAMEKEYS = {
   current: 'nfl',
   2020: '399',
@@ -52,14 +51,24 @@ function yahooFantasy() {
     return leagues.find((l) => l[0].league_id == id)
   }
 
-  // Lookup in SCADSERVICE
-  async function getMyTeams(access_token) {
+  async function getMyCurrentSeasonTeams(access_token) {
+    debug('getMyCurrentSeasonTeams')
+    try {
+      let cs = await getCurrentYahooGame(access_token)
+      return await getMyTeams(access_token, cs.game_key)
+    } catch (error) {
+      debug('ERR getMyCurrentSeasonTeams', error)
+      throw `Error connecting to Yahoo Fantasy`
+    }
+  }
+
+  async function getMyTeams(access_token, gameKey) {
     debug('getMyTeams')
     try {
       var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
       yf.setUserToken(access_token)
 
-      let result = await yf.user.game_teams(`${GAMEKEY}`)
+      let result = await yf.user.game_teams(`${gameKey}`)
       return result.teams[0].teams
     } catch (error) {
       debug('ERR getMyTeams', error)
@@ -67,27 +76,87 @@ function yahooFantasy() {
     }
   }
 
-  // Lookup in SCADSERVICE
-  async function getMyTeam(access_token, yahooLeagueId) {
+  async function getMyTeam(access_token, yahooLeagueId, gameKey) {
     debug('getMyTeam')
     try {
-      let myTeams = await getMyTeams(access_token)
+      let myTeams
+      if (!gameKey) {
+        let yg = await getCurrentYahooGame(access_token)
+        gameKey = yg.game_key
+      }
+      myTeams = await getMyTeams(access_token, gameKey)
       let myTeam = myTeams.find((t) => t.team_key.includes(yahooLeagueId))
-      return await getTeamWithRoster(access_token, yahooLeagueId, myTeam.team_id)
+      return await getTeamWithRoster(access_token, yahooLeagueId, myTeam.team_id, gameKey)
     } catch (error) {
       debug('ERR getMyTeam', error)
       throw `Error connecting to Yahoo Fantasy`
     }
   }
 
-  // Lookup in SCADSERVICE
-  async function getLeagueMeta(access_token, yahooLeagueId) {
+  async function getCurrentSeasonTeamWithRoster(access_token, yahooLeagueId, yahooTeamId) {
+    debug('getCurrentSeasonTeamWithRoster')
+    try {
+      let cs = await getCurrentYahooGame(access_token)
+      return await getTeamWithRoster(access_token, yahooLeagueId, yahooTeamId, cs.game_key)
+    } catch (error) {
+      debug('ERR getCurrentSeasonTeamWithRoster', error)
+      throw `Error connecting to Yahoo Fantasy`
+    }
+  }
+
+  async function getTeamWithRoster(access_token, yahooLeagueId, yahooTeamId, gameKey) {
+    debug('getTeamWithRoster')
+    try {
+      var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
+      yf.setUserToken(access_token)
+
+      let result = await yf.roster.players(`${gameKey}.l.${yahooLeagueId}.t.${yahooTeamId}`)
+      return result
+    } catch (error) {
+      debug('ERR getTeamWithRoster', error)
+      throw `Error connecting to Yahoo Fantasy`
+    }
+  }
+
+  async function getCurrentSeasonLeagueDetails(access_token, details, yahooLeagueId) {
+    debug('getCurrentSeasonLeagueDetails')
+    try {
+      let cs = await getCurrentYahooGame(access_token)
+      return await getLeagueDetails(access_token, details, yahooLeagueId, cs.game_key)
+    } catch (error) {
+      debug('ERR getCurrentSeasonLeagueDetails', error)
+      throw `Error connecting to Yahoo Fantasy`
+    }
+  }
+
+  async function getPreviousSeasonLeagueDetails(access_token, details, yahooLeagueId, year) {
+    debug('getPreviousSeasonLeagueDetails')
+    try {
+      let ps = await getPreviousYahooGame(access_token, year)
+      return await getLeagueDetails(access_token, details, yahooLeagueId, ps.game_key)
+    } catch (error) {
+      debug('ERR getLeagueMeta', error)
+      throw `Error connecting to Yahoo Fantasy`
+    }
+  }
+
+  async function getLeagueDetails(access_token, details, yahooLeagueId, gameKey) {
+    debug('getLeagueDetails')
+    if (details === 'meta') return await getLeagueMeta(access_token, gameKey, yahooLeagueId)
+    else if (details === 'settings') return await getLeagueSettings(access_token, gameKey, yahooLeagueId)
+    else if (details === 'standings') return await getLeagueStandings(access_token, gameKey, yahooLeagueId)
+    else if (details === 'teams') return await getLeagueTeams(access_token, gameKey, yahooLeagueId)
+    else if (details === 'transactions') return await getLeagueTransactions(access_token, gameKey, yahooLeagueId)
+    else return
+  }
+
+  async function getLeagueMeta(access_token, gameKey, yahooLeagueId) {
     debug('getLeagueMeta')
     try {
       var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
       yf.setUserToken(access_token)
 
-      let result = await yf.league.meta(`${GAMEKEY}.l.${yahooLeagueId}`)
+      let result = await yf.league.meta(`${gameKey}.l.${yahooLeagueId}`)
 
       return result
     } catch (error) {
@@ -96,14 +165,13 @@ function yahooFantasy() {
     }
   }
 
-  // Lookup in SCADSERVICE
-  async function getLeagueSettings(access_token, yahooLeagueId) {
+  async function getLeagueSettings(access_token, gameKey, yahooLeagueId) {
     debug('getLeagueSettings')
     try {
       var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
       yf.setUserToken(access_token)
 
-      let result = await yf.league.settings(`${GAMEKEY}.l.${yahooLeagueId}`)
+      let result = await yf.league.settings(`${gameKey}.l.${yahooLeagueId}`)
       return result.settings
     } catch (error) {
       debug('ERR getLeagueSettings', error)
@@ -111,14 +179,13 @@ function yahooFantasy() {
     }
   }
 
-  // Lookup in SCADSERVICE
-  async function getLeagueStandings(access_token, yahooLeagueId) {
+  async function getLeagueStandings(access_token, gameKey, yahooLeagueId) {
     debug('getLeagueStandings')
     try {
       var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
       yf.setUserToken(access_token)
 
-      let result = await yf.league.standings(`${GAMEKEY}.l.${yahooLeagueId}`)
+      let result = await yf.league.standings(`${gameKey}.l.${yahooLeagueId}`)
       return result.standings
     } catch (error) {
       debug('ERR getLeagueStandings', error)
@@ -126,14 +193,13 @@ function yahooFantasy() {
     }
   }
 
-  // Lookup in SCADSERVICE
-  async function getLeagueTeams(access_token, yahooLeagueId) {
+  async function getLeagueTeams(access_token, gameKey, yahooLeagueId) {
     debug('getLeagueTeams')
     try {
       var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
       yf.setUserToken(access_token)
 
-      let result = await yf.league.teams(`${GAMEKEY}.l.${yahooLeagueId}`)
+      let result = await yf.league.teams(`${gameKey}.l.${yahooLeagueId}`)
       return result.teams
     } catch (error) {
       debug('ERR getLeagueTeams', error)
@@ -141,17 +207,32 @@ function yahooFantasy() {
     }
   }
 
-  async function getCurrentYahooGame(access_token) {
-    debug('getCurrentYahooSeason')
+  async function getLeagueTransactions(access_token, gameKey, yahooLeagueId) {
+    debug('getLeagueTransactions')
     try {
       var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
       yf.setUserToken(access_token)
 
-      let result = await yf.game.meta(GAMEKEY)
+      let result = await yf.league.transactions(`${gameKey}.l.${yahooLeagueId}`)
+      result.transactions = result.transactions.slice(0, 50)
+      return result
+    } catch (error) {
+      debug('ERR getLeagueTransactions', error)
+      throw `Error connecting to Yahoo Fantasy`
+    }
+  }
+
+  async function getCurrentYahooGame(access_token) {
+    debug('getCurrentYahooGame')
+    try {
+      var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
+      yf.setUserToken(access_token)
+
+      let result = await yf.game.meta('nfl')
 
       return result
     } catch (error) {
-      debug('ERR getCurrentYahooSeason', error)
+      debug('ERR getCurrentYahooGame', error)
       throw `Error connecting to Yahoo Fantasy`
     }
   }
@@ -204,12 +285,14 @@ function yahooFantasy() {
       if (result.games[0].leagues.length > 0) {
         return result.games[0].leagues
       } else {
+        debug(`Did not find Users Leagues for gameKey: ${gameKey}, ${year}. Getting previous year's leagues.`)
         return await getUserLeaguesByPriorSeason(access_token, year)
       }
     } catch (error) {
       // If Error contained the below, the idea is the Yahoo Fantasy API is in offseason
       // If so, let's retrieve previous years leagues.
       if (JSON.stringify(error).includes('There was a temporary problem with the server.')) {
+        debug('Yahoo server is down, probably offseason updates.  Getting previous years leagues.')
         return await getUserLeaguesByPriorSeason(access_token, year)
       } else {
         debug('ERR getUserLeaguesBySeason', error)
@@ -218,43 +301,12 @@ function yahooFantasy() {
     }
   }
 
-  async function getLeagueTransactions(access_token, yahooLeagueId) {
-    debug('getLeagueTransactions')
-    try {
-      var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
-      yf.setUserToken(access_token)
-
-      let result = await yf.league.transactions(`${GAMEKEY}.l.${yahooLeagueId}`)
-      result.transactions = result.transactions.slice(0, 50)
-      return result
-    } catch (error) {
-      debug('ERR getLeagueTransactions', error)
-      throw `Error connecting to Yahoo Fantasy`
-    }
-  }
-
-  // Lookup in SCADSERVICE
-  async function getTeamWithRoster(access_token, yahooLeagueId, yahooTeamId) {
-    debug('getTeamWithRoster')
-    try {
-      var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
-      yf.setUserToken(access_token)
-
-      let result = await yf.roster.players(`${GAMEKEY}.l.${yahooLeagueId}.t.${yahooTeamId}`)
-      return result
-    } catch (error) {
-      debug('ERR getTeamWithRoster', error)
-      throw `Error connecting to Yahoo Fantasy`
-    }
-  }
-
-  // Lookup in SCADSERVICE
   async function getAllCommishLeagues(access_token) {
     debug('getAllCommishLeagues')
     try {
       // Find leagues from users teams they're a commish for.
       let commishLeaguesKeys = []
-      let myTeams = await getMyTeams(access_token)
+      let myTeams = await getMyCurrentSeasonTeams(access_token)
       for (const team of myTeams) {
         let manager = team.managers[0]
         if (
@@ -271,7 +323,7 @@ function yahooFantasy() {
       let commishLeagues = []
       if (commishLeaguesKeys.length > 0) {
         for (const key of commishLeaguesKeys) {
-          let league = await getLeagueMeta(access_token, key)
+          let league = await getCurrentSeasonLeagueDetails(access_token, 'meta', key)
           commishLeagues.push(league)
         }
       }
@@ -283,18 +335,19 @@ function yahooFantasy() {
     }
   }
 
-  // Lookup in SCADSERVICE
   async function getAllLeaguePlayers(access_token, yahooLeagueId) {
     debug('getAllLeaguePlayers')
     try {
-      let teams = await getLeagueTeams(access_token, yahooLeagueId)
+      let teams = await getCurrentSeasonLeagueDetails(access_token, 'teams', yahooLeagueId)
       let players = []
 
       // For each team, get their roster and push each player
-      for (const team of teams) {
-        let roster = await getTeamWithRoster(access_token, yahooLeagueId, team.team_id)
-        for (const p of roster.roster) {
-          players.push(p)
+      if (teams) {
+        for (const team of teams) {
+          let roster = await getCurrentSeasonTeamWithRoster(access_token, yahooLeagueId, team.team_id)
+          for (const p of roster.roster) {
+            players.push(p)
+          }
         }
       }
 
@@ -313,18 +366,23 @@ function yahooFantasy() {
   return {
     getGames,
     getGameKey,
+    getMyCurrentSeasonTeams,
     getMyTeams,
     getMyTeam,
+    getCurrentSeasonTeamWithRoster,
+    getTeamWithRoster,
+    getCurrentSeasonLeagueDetails,
+    getPreviousSeasonLeagueDetails,
+    getLeagueDetails,
     getLeagueMeta,
     getLeagueSettings,
     getLeagueStandings,
     getLeagueTeams,
+    getLeagueTransactions,
     getCurrentYahooGame,
     getPreviousYahooGame,
     getUserLeaguesByCurrentSeason,
     getUserLeaguesBySeason,
-    getLeagueTransactions,
-    getTeamWithRoster,
     getAllCommishLeagues,
     getAllLeaguePlayers,
   }

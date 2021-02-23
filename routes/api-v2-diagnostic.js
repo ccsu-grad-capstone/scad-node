@@ -26,12 +26,12 @@ async function getDiagnostic(req, res) {
   }
 }
 
-function createDiagnostic(req, res) {
+async function createDiagnostic(req, res) {
   const d = req.body.data
   debug('create')
   if (d) {
     try {
-      diagnostic.create(d)
+      await diagnostic.create(d)
       res.send('Diagnostic Created successfully')
     } catch (error) {
       debug(error)
@@ -42,12 +42,12 @@ function createDiagnostic(req, res) {
   }
 }
 
-function updateDiagnostic(req, res) {
+async function updateDiagnostic(req, res) {
   const { id } = req.params
   const d = req.body.data
   debug('update')
   try {
-    diagnostic.update(id, d)
+    await diagnostic.update(id, d)
     res.send('Diagnostic updated successfully')
   } catch (error) {
     debug(error)
@@ -55,11 +55,11 @@ function updateDiagnostic(req, res) {
   }
 }
 
-function removeDiagnostic(req, res) {
+async function removeDiagnostic(req, res) {
   const { id } = req.params
   debug('remove')
   try {
-    diagnostic.remove(id)
+    await diagnostic.remove(id)
     res.send('Diagnostic removed successfully')
   } catch (error) {
     debug(error)

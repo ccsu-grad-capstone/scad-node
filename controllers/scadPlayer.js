@@ -1,9 +1,9 @@
 const debug = require('debug')('app:ScadPlayerController')
 const moment = require('moment')
 const ScadPlayer = require('../models/ScadPlayer')
+const ScadLeague = require('../models/ScadLeague')
 const scadTeamController = require('./scadTeam')
 const yf = require('../services/yahooFantasy')
-const ScadLeague = require('../models/ScadLeague')
 
 async function getById(id) {
   debug('Getting ScadPlayer by id: ')
@@ -19,23 +19,24 @@ async function getAllByScadLeagueId(id) {
   return await ScadPlayer.find({ scadLeagueId: id })
 }
 
-async function getAllByYahooLeagueId(id) {
-  debug('Getting all ScadPlayers for league by yahooLeagueId', id)
-  return await ScadPlayer.find({ yahooLeagueId: id })
+async function getAllByYahooLeagueId(yahooGameKey, yahooLeagueId) {
+  debug('Getting all ScadPlayers for league by yahooLeagueId', yahooGameKey, yahooLeagueId)
+  let sl = await ScadLeague.findOne({ yahooGameKey: yahooGameKey, yahooLeagueId: yahooLeagueId })
+  return await getAllByScadLeagueId(sl._id)
 }
 
 async function getMyPlayersByScadId(scadLeagueId, access_token) {
   debug('Getting all ScadPlayers for my team by scad ids', scadLeagueId)
 
   let scadLeague = await ScadLeague.findById(scadLeagueId)
-  let myt = await yf.getMyTeam(access_token, scadLeague.yahooLeagueId)
+  let myt = await yf.getMyTeam(access_token, scadLeague.yahooLeagueId, scadLeague.yahooGameKey)
   return await getScadPlayersFromYahooTeam(myt, scadLeague.yahooLeagueId)
 }
 
-async function getMyPlayersByYahooId(yahooLeagueId, access_token) {
-  debug('Getting all ScadPlayers for my team by yahooLeagueId', yahooLeagueId)
+async function getMyPlayersByYahooId(yahooGameKey, yahooLeagueId, access_token) {
+  debug('Getting all ScadPlayers for my team by yahooLeagueId', yahooGameKey, yahooLeagueId)
 
-  let myt = await yf.getMyTeam(access_token, yahooLeagueId)
+  let myt = await yf.getMyTeam(access_token, yahooLeagueId, yahooGameKey)
   return await getScadPlayersFromYahooTeam(myt, yahooLeagueId)
 }
 
@@ -43,15 +44,15 @@ async function getAllTeamPlayersByScadTeamId(scadTeamId, access_token) {
   debug('Getting all ScadPlayers for team by scad ids')
 
   let scadTeam = await scadTeamController.getById(scadTeamId)
-  const yt = await yf.getTeamWithRoster(access_token, scadTeam.yahooLeagueId, scadTeam.yahooTeamId)
+  const yt = await yf.getCurrentSeasonTeamWithRoster(access_token, scadTeam.yahooLeagueId, scadTeam.yahooTeamId)
 
   return await getScadPlayersFromYahooTeam(yt, scadTeam.yahooLeagueId)
 }
 
-async function getAllForTeamByYahooIds(yahooLeagueId, yahooTeamId, access_token) {
-  debug('Getting all ScadPlayers for league by yahooLeagueId', yahooLeagueId)
+async function getAllForTeamByYahooIds(gameKey, yahooLeagueId, yahooTeamId, access_token) {
+  debug('Getting all ScadPlayers for league by yahooLeagueId', gameKey, yahooLeagueId, yahooTeamId)
 
-  const yt = await yf.getTeamWithRoster(access_token, yahooLeagueId, yahooTeamId)
+  const yt = await yf.getTeamWithRoster(access_token, yahooLeagueId, yahooTeamId, gameKey)
 
   return await getScadPlayersFromYahooTeam(yt, yahooLeagueId)
 }
@@ -79,11 +80,15 @@ async function update(id, scadPlayer) {
   debug('Updating ScadPlayer: ', id)
   const player = await getById(id)
 
-  Object.assign(player, scadPlayer)
-  player.updated = moment().format()
-  await player.save()
-
-  return player
+  if (player) {
+    Object.assign(player, scadPlayer)
+    player.updated = moment().format()
+    await player.save()
+  
+    return player
+  } else {
+    throw ('Player not found.')
+  }
 }
 
 async function remove(id) {

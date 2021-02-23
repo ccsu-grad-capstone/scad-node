@@ -30,11 +30,11 @@ async function getById(req, res) {
   }
 }
 
-function create(req, res) {
+async function create(req, res) {
   const team = req.body.data
   if (team) {
     try {
-      scadTeam.create(team)
+      await scadTeam.create(team)
       res.send('Scad Team Created successfully')
     } catch (error) {
       debug(error)
@@ -45,12 +45,12 @@ function create(req, res) {
   }
 }
 
-function update(req, res) {
+async function update(req, res) {
   const { id } = req.params
   const team = req.body.data
-  debug('update')
+  debug('update SCAD team')
   try {
-    scadTeam.update(id, team)
+    await scadTeam.update(id, team)
     res.send('Scad Team updated successfully')
   } catch (error) {
     debug(error)
@@ -58,11 +58,11 @@ function update(req, res) {
   }
 }
 
-function remove(req, res) {
+async function remove(req, res) {
   const { id } = req.params
   debug('remove')
   try {
-    scadTeam.remove(id)
+    await scadTeam.remove(id)
     res.send('Scad Team removed successfully')
   } catch (error) {
     debug(error)

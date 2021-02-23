@@ -7,13 +7,13 @@ const userDefaultLeagueController = require('./userDefaultLeague')
 const yf = require('../services/yahooFantasy')
 
 async function getById(id) {
-  debug('Getting ScadLeague by id: ')
+  debug('Getting ScadLeague by id:', id)
   return await ScadLeague.findById(id)
 }
 
-async function getByYahooLeagueId(yahooLeagueId) {
-  debug('Getting ScadLeague by yahooLeagueId: ')
-  return await ScadLeague.findOne({ yahooLeagueId: yahooLeagueId })
+async function getByYahooLeagueId(gameKey, yahooLeagueId) {
+  debug('Getting ScadLeague by yahooLeagueId:', gameKey, yahooLeagueId)
+  return await ScadLeague.findOne({ yahooGameKey: gameKey, yahooLeagueId: yahooLeagueId })
 }
 
 async function create(scadLeague, access_token) {
@@ -22,19 +22,19 @@ async function create(scadLeague, access_token) {
 
     // Check if SCAD league already exists for YahooLeagueId
 
-    if (await ScadLeague.findOne({ yahooLeagueId: scadLeague.yahooLeagueId })) {
-      throw 'It appears a SCAD league already exists for this Yahoo League. '
-    }
+    // if (await ScadLeague.findOne({ yahooLeagueId: scadLeague.yahooLeagueId })) {
+    //   throw 'It appears a SCAD league already exists for this Yahoo League. '
+    // }
 
     // Create and save SCAD league to db
     const newScadLeague = new ScadLeague(scadLeague)
     const currentYahooGame = await yf.getCurrentYahooGame(access_token)
-    newScadLeague.yahooGameId = currentYahooGame.game_id
+    newScadLeague.yahooGameKey = currentYahooGame.game_key
     newScadLeague.created = moment().format()
     newScadLeague.updated = moment().format()
     await newScadLeague.save()
 
-    const yahooTeams = await yf.getLeagueTeams(access_token, scadLeague.yahooLeagueId)
+    const yahooTeams = await yf.getCurrentSeasonLeagueDetails(access_token, 'teams', scadLeague.yahooLeagueId)
     const yahooLeaguePlayers = await yf.getAllLeaguePlayers(access_token, scadLeague.yahooLeagueId)
 
     for (const yt of yahooTeams) {
@@ -55,8 +55,9 @@ async function create(scadLeague, access_token) {
         if (await userDefaultLeagueController.getByGuid(manager.guid)) {
           debug('User Default League already exists for user ', manager.nickname)
         } else {
+          yahooGame = await yf.getCurrentYahooGame(access_token)
           let udl = {
-            yahooGameId: newScadLeague.yahooGameId,
+            yahooGame: yahooGame,
             yahooLeagueId: newScadLeague.yahooLeagueId,
             scadLeagueId: newScadLeague._id,
             guid: manager.guid,
@@ -96,11 +97,15 @@ async function update(id, scadLeague) {
   debug('Updating ScadLeague: ', id)
   const league = await getById(id)
 
-  Object.assign(league, scadLeague)
-  league.updated = moment().format()
-  await league.save()
-
-  return league
+  if (league) {
+    Object.assign(league, scadLeague)
+    league.updated = moment().format()
+    await league.save()
+  
+    return league
+  } else {
+    throw('League not found.')
+  }
 }
 
 async function remove(id) {
@@ -113,16 +118,4 @@ async function getAll() {
   return await ScadLeague.find()
 }
 
-// INCOMPLETE
-async function getDefault() {
-  debug('Getting default Scad League')
-  return await ScadLeague.find()
-}
-
-// INCOMPLETE
-async function updateDefault() {
-  debug('Update default Scad League')
-  return await ScadLeague.find()
-}
-
-module.exports = { getAll, getById, getByYahooLeagueId, create, update, remove, getDefault, updateDefault }
+module.exports = { getAll, getById, getByYahooLeagueId, create, update, remove }

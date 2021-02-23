@@ -42,12 +42,12 @@ async function getTransaction(req, res) {
   }
 }
 
-function createTransaction(req, res) {
+async function createTransaction(req, res) {
   const t = req.body.data
   debug('create')
   if (t) {
     try {
-      transaction.create(t)
+      await transaction.create(t)
       res.send('Transaction Created successfully')
     } catch (error) {
       debug(error)
@@ -58,12 +58,12 @@ function createTransaction(req, res) {
   }
 }
 
-function updateTransaction(req, res) {
+async function updateTransaction(req, res) {
   const { id } = req.params
   const t = req.body.data
   debug('update')
   try {
-    transaction.update(id, t)
+    await transaction.update(id, t)
     res.send('Transaction updated successfully')
   } catch (error) {
     debug(error)
@@ -71,11 +71,11 @@ function updateTransaction(req, res) {
   }
 }
 
-function removeTransaction(req, res) {
+async function removeTransaction(req, res) {
   const { id } = req.params
   debug('remove')
   try {
-    transaction.remove(id)
+    await transaction.remove(id)
     res.send('Transaction removed successfully')
   } catch (error) {
     debug(error)

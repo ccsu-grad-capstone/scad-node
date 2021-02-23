@@ -61,11 +61,11 @@ async function getAllByTeam(req, res) {
   }
 }
 
-function create(req, res) {
+async function create(req, res) {
   const dp = req.body.data
   if (dp) {
     try {
-      draftPicks.create(dp)
+      await draftPicks.create(dp)
       res.send('Draft Pick Created successfully')
     } catch (error) {
       debug(error)
@@ -76,12 +76,12 @@ function create(req, res) {
   }
 }
 
-function update(req, res) {
+async function update(req, res) {
   const { id } = req.params
   const dp = req.body.data
   debug('update')
   try {
-    draftPicks.update(id, dp)
+    await draftPicks.update(id, dp)
     res.send('Draft Pick updated successfully')
   } catch (error) {
     debug(error)
@@ -112,11 +112,11 @@ async function updateLeague(req, res) {
   }
 }
 
-function remove(req, res) {
+async function remove(req, res) {
   const { id } = req.params
   debug('remove')
   try {
-    draftPicks.remove(id)
+    await draftPicks.remove(id)
     res.send('Draft Pick removed successfully')
   } catch (error) {
     debug(error)

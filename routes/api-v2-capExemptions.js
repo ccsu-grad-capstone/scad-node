@@ -61,13 +61,13 @@ async function getAllByTeam(req, res) {
   }
 }
 
-function create(req, res) {
+async function create(req, res) {
   debug('create')
   const ce = req.body.data
   ce.timestamp = moment()
   if (ce) {
     try {
-      capExemptions.create(ce)
+      await capExemptions.create(ce)
       res.send('Cap Exemption Created successfully')
     } catch (error) {
       debug(error)
@@ -76,12 +76,12 @@ function create(req, res) {
   }
 }
 
-function update(req, res) {
+async function update(req, res) {
   const { id } = req.params
   const ce = req.body.data
   debug('update')
   try {
-    capExemptions.update(id, ce)
+    await capExemptions.update(id, ce)
     res.send('Cap Exemption updated successfully')
   } catch (error) {
     debug(error)
@@ -112,11 +112,11 @@ async function updateLeague(req, res) {
   }
 }
 
-function remove(req, res) {
+async function remove(req, res) {
   const { id } = req.params
   debug('remove')
   try {
-    capExemptions.remove(id)
+    await capExemptions.remove(id)
     res.send('Cap Exemption removed successfully')
   } catch (error) {
     debug(error)
