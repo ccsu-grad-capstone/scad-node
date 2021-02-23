@@ -2,16 +2,16 @@ const debug = require('debug')('app:scadDashboardController')
 const scadTeamController = require('./scadTeam')
 const scadPlayerController = require('./scadPlayer')
 const userDefaultLeagueController = require('./userDefaultLeague')
+const usersController = require('./users')
 const yf = require('../services/yahooFantasy')
 const scadLeague = require('../controllers/scadLeague')
 
-async function getDashboardDetails(access_token) {
-  let guid = '2OMLCT3C2A42Z3FCGWJZCIDYLU'
+async function getDashboardDetails(access_token, idToken) {
 
   try {
     // Check if user had a default league
     // If exists, pass in default league..
-    let udl = await userDefaultLeagueController.getByGuid(guid)
+    let udl = await userDefaultLeagueController.getByGuid(await usersController.getUserGuid(idToken))
     let cyg = await yf.getCurrentYahooGame(access_token)
 
     // If UDL exists and yahooGameKey is current, we're good to go. Gather info and return..

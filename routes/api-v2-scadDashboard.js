@@ -10,10 +10,10 @@ scadDashboardRouter.get('/details', scadAuth(), getDashboardDetails)
 module.exports = scadDashboardRouter
 
 async function getDashboardDetails(req, res) {
-  const { access_token } = req.headers
+  const { access_token, id_token } = req.headers
   debug('getDashboardDetails')
   try {
-    const result = await scadDashboard.getDashboardDetails(access_token)
+    const result = await scadDashboard.getDashboardDetails(access_token, id_token)
     res.json({ result })
   } catch (error) {
     debug(error)
