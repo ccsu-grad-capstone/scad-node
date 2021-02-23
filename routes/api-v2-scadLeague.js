@@ -12,6 +12,7 @@ scadLeagueRouter.get('/:id', scadAuth(), getById)
 scadLeagueRouter.get('/yahoo/:gameKey/:yahooLeagueId', scadAuth(), getByYahooLeagueId)
 scadLeagueRouter.put('/:id', scadAuth(), update)
 scadLeagueRouter.post('/', scadAuth(), create)
+scadLeagueRouter.post('/:id/renew/:renewedLeagueId', scadAuth(), renewLeague)
 scadLeagueRouter.delete('/:id', scadAuth(), remove)
 scadLeagueRouter.get('/get/all', scadAuth(), getAll)
 // INCOMPLETE - Default League
@@ -28,7 +29,11 @@ scadLeagueRouter.get('/yahoo/:gameKey/:yahooLeagueId/team/myTeam', scadAuth(), g
 scadLeagueRouter.get('/:id/player/all', scadAuth(), getAllPlayersByScadLeagueId)
 scadLeagueRouter.get('/yahoo/:gameKey/:yahooLeagueId/player/all', scadAuth(), getAllPlayersByYahooLeagueId)
 
-scadLeagueRouter.get('/yahoo/:gameKey/:yahooLeagueId/team/:yahooTeamId/players', scadAuth(), getAllTeamPlayersByYahooIds)
+scadLeagueRouter.get(
+  '/yahoo/:gameKey/:yahooLeagueId/team/:yahooTeamId/players',
+  scadAuth(),
+  getAllTeamPlayersByYahooIds
+)
 
 scadLeagueRouter.get('/:id/players/myPlayers', scadAuth(), getMyPlayersByScadId) //
 scadLeagueRouter.get('/yahoo/:gameKey/:yahooLeagueId/player/myPlayers', scadAuth(), getMyPlayersByYahooId) //
@@ -78,6 +83,24 @@ async function create(req, res) {
     }
   } else {
     res.status(500).send('No Scad League supplied with request.')
+  }
+}
+
+async function renewLeague(req, res) {
+  debug('renewLeague')
+  const { id, renewedLeagueId } = req.params
+  const { access_token } = req.headers
+
+  if (id && renewedLeagueId) {
+    try {
+      await scadLeague.renewLeague(id, renewedLeagueId, access_token)
+      res.send('Scad League Renewed Successfully')
+    } catch (error) {
+      debug(error)
+      res.status(500).send(error)
+    }
+  } else {
+    res.status(500).send('Missing Scad League Parameters with request.')
   }
 }
 
@@ -279,5 +302,3 @@ async function getMyPlayersByYahooId(req, res) {
     res.status(500).send('An Error Occured Retrieving Scad Players')
   }
 }
-
-

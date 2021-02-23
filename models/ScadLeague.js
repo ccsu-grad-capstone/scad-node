@@ -28,9 +28,9 @@ const schema = new Schema({
 	kMax: { type: Number, required: true },
 	defMin: { type: Number, required: true },
 	defMax: { type: Number, required: true },
-	isDefault: { type: Boolean, required: true },
 	ownerGuid: { type: String },
-	renewSCADLeagueId: { type: String },
+	renewScadLeagueId: { type: String },
+	previousScadLeagueId: { type: String },
 	rosterSpotLimit: { type: Number, required: true },
   updated: { type: String },
   created: { type: String }

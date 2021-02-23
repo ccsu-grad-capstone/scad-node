@@ -5,12 +5,17 @@ const yf = require('../services/yahooFantasy')
 
 async function getById(id) {
   debug('Getting UserDefaultLeague by id: ')
-  return await UserDefaultLeague.findById(id)
+  return await UserDefaultLeague.findById(id).populate('scadLeagueId')
 }
 
 async function getByGuid(guid) {
-  debug('Getting UserDefaultLeague by yahooLeagueId: ')    
+  debug('Getting UserDefaultLeague by guid: ')    
   return await UserDefaultLeague.findOne({ guid: guid }).populate('scadLeagueId')
+}
+
+async function getByYahooLeagueId (yahooLeagueId) {
+  debug('Getting UserDefaultLeague by getByYahooLeagueId: ')    
+  return await UserDefaultLeague.find({ yahooLeagueId: yahooLeagueId })
 }
 
 async function create(userDefaultLeague) {
@@ -44,4 +49,4 @@ async function remove(guid) {
   return await UserDefaultLeague.findByIdAndRemove(guid).exec()
 }
 
-module.exports = { getById, getByGuid, create, update, remove }
+module.exports = { getById, getByGuid, getByYahooLeagueId, create, update, remove }

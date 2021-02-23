@@ -93,6 +93,129 @@ async function create(scadLeague, access_token) {
   }
 }
 
+// sl = scad league (needing to update)
+// cyg = current yahoo game
+async function renewLeague(id, renewedLeagueId, access_token) {
+  debug('renewLeague', id, renewedLeagueId)
+
+  const sl = await getById(id)
+  const cyg = await yf.getCurrentYahooGame(access_token)
+
+  try {
+    // Check if SCAD league already exists for YahooLeagueId
+
+    if (await ScadLeague.findOne({ yahooLeagueId: renewedLeagueId })) {
+      throw 'It appears a SCAD league already exists for this renewed Yahoo League. '
+    }
+
+    // Create and save SCAD league to db
+
+    let season = sl.seasonYear + 1
+
+    let nsl = { 
+      yahooLeagueId: renewedLeagueId,
+      seasonYear: season,
+      leagueManagers: sl.leagueManagers,
+      rookieDraftRds: sl.rookieDraftRds,
+      rookieDraftStrategy: sl.rookieDraftStrategy,
+      rookieWageScale: sl.rookieWageScale ,
+      teamSalaryCap: sl.teamSalaryCap,
+      leagueSalaryCap: sl.leagueSalaryCap,
+      salaryCapExemptionLimit: sl.salaryCapExemptionLimit,
+      irReliefPerc: sl.irReliefPerc,
+      franchiseTagDiscount: sl.franchiseTagDiscount,
+      franchiseTagSpots: sl.franchiseTagSpots,
+      tradingDraftPickYears: sl.tradingDraftPickYears,
+      qbMin: sl.qbMin,
+      qbMax: sl.qbMax,
+      rbMin: sl.rbMin,
+      rbMax: sl.rbMax,
+      wrMin: sl.wrMin,
+      wrMax: sl.wrMax,
+      teMin: sl.teMin,
+      teMax: sl.teMax,
+      kMin: sl.kMin,
+      kMax: sl.kMax,
+      defMin: sl.defMin,
+      defMax: sl.defMax,
+      rosterSpotLimit: sl.rosterSpotLimit,
+      yahooGameKey: cyg.game_key,
+      previousScadLeagueId: sl._id,
+      created: moment().format(),
+      updated: moment().format(),
+    }
+    let newScadLeague = new ScadLeague(nsl)
+    await newScadLeague.save()
+
+    // Update previous season scad league renewScadLeagueId
+    sl.renewScadLeagueId = newScadLeague._id
+    await update(sl._id, sl)
+
+    const prevScadTeams = await scadTeamController.getAllByScadLeagueId(sl._id)
+    const udls = await userDefaultLeagueController.getByYahooLeagueId(newScadLeague.yahooLeagueId)
+    const scadPlayers = await scadPlayerController.getAllByScadLeagueId(sl._id)
+
+    debug('Renew each SCAD team')
+    for (const st of prevScadTeams) {
+      // Renew each scad team
+      let nst = {
+        yahooTeamId: st.yahooTeamId,
+        yahooLeagueId: newScadLeague.yahooLeagueId,
+        scadLeagueId: newScadLeague._id,
+        salary: 0,
+        isFranchiseTag: false,
+        exceptionIn: 0,
+        exceptionOut: 0,
+        previousScadTeamId: st._id,
+      }
+      nst = await scadTeamController.create(nst)
+
+      st.renewScadTeamId = nst._id
+      await scadTeamController.update(st._id, st)
+    }
+    debug('Finished renewing SCAD teams')
+    
+    debug('For each UDL that matches renewed league, update UDL.')
+    for (const udl of udls) {
+      udl.yahooGame = cyg
+      udl.yahooLeagueId = newScadLeague.yahooLeagueId
+      udl.scadLeagueId = newScadLeague._id
+      
+      await userDefaultLeagueController.update(udl.guid, udl)
+    }
+    debug('Finished updating User Default Leagues')
+
+    debug('For each SCAD player in renewed league, renew SCAD player.')
+    for (const sp of scadPlayers) {
+      let nsp = {
+        yahooPlayerId: sp.yahooPlayerId,
+        yahooLeagueId: newScadLeague.yahooLeagueId,
+        scadLeagueId: newScadLeague._id,
+        salary: sp.salary,
+        isFranchiseTag: false,
+        previousYearSalary: sp.salary,
+        previousScadPlayerId: sp._id
+      }
+      nsp = await scadPlayerController.create(nsp)
+
+      sp.renewScadPlayerId = nsp._id
+      await scadPlayerController.update(sp._id, sp)
+    }
+    debug('Finished renewing SCAD players')
+
+    debug('Finished renewing SCAD league')
+
+  } catch (error) {
+    if (JSON.stringify(error).includes('already exists')) {
+      debug('ERR renewLeague', error)
+      throw error
+    } else {
+      debug('ERR renewLeague', error)
+      throw 'An Error Occured Creating Scad League'
+    }
+  }
+}
+
 async function update(id, scadLeague) {
   debug('Updating ScadLeague: ', id)
   const league = await getById(id)
@@ -101,10 +224,10 @@ async function update(id, scadLeague) {
     Object.assign(league, scadLeague)
     league.updated = moment().format()
     await league.save()
-  
+
     return league
   } else {
-    throw('League not found.')
+    throw 'League not found.'
   }
 }
 
@@ -118,4 +241,12 @@ async function getAll() {
   return await ScadLeague.find()
 }
 
-module.exports = { getAll, getById, getByYahooLeagueId, create, update, remove }
+module.exports = {
+  getAll,
+  getById,
+  getByYahooLeagueId,
+  create,
+  renewLeague,
+  update,
+  remove,
+}

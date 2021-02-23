@@ -74,10 +74,13 @@ async function create(scadPlayer) {
   player.updated = moment().format()
 
   await player.save()
+
+  return player
 }
 
 async function update(id, scadPlayer) {
   debug('Updating ScadPlayer: ', id)
+  
   const player = await getById(id)
 
   if (player) {

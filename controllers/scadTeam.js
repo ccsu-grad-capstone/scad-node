@@ -29,7 +29,6 @@ async function getMyTeamByScadLeagueId(id, access_token, yahooGameKey) {
   debug('Getting my ScadTeam for scadLeagueId', id)
 
   const scadLeagueTeams = await getAllByScadLeagueId(id)
-  
   let myYahooTeams
   if (!yahooGameKey) {
     let yg = await yf.getCurrentYahooGame(access_token)
@@ -58,6 +57,8 @@ async function create(scadTeam) {
   team.updated = moment().format()
 
   await team.save()
+
+  return team
 }
 
 async function update(id, scadTeam) {
@@ -69,7 +70,7 @@ async function update(id, scadTeam) {
     team.updated = moment().format()
     await team.save()
   
-    return
+    return team
   } else {
     throw('Team not found.')
   }

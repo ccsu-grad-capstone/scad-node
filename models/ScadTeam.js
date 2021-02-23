@@ -9,7 +9,8 @@ const schema = new Schema({
 	isFranchiseTag: { type: Boolean, required: true },
 	exceptionIn: { type: Number, required: true },
 	exceptionOut: { type: Number, required: true },
-	renewSCADLeagueTeamId: { type: Schema.Types.ObjectId, ref: 'ScadTeam'},
+	renewScadTeamId: { type: Schema.Types.ObjectId, ref: 'ScadTeam'},
+	previousScadTeamId: { type: Schema.Types.ObjectId, ref: 'ScadTeam'},
   updated: { type: String },
   created: { type: String }
 })

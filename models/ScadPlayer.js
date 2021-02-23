@@ -7,7 +7,8 @@ const schema = new Schema({
 	scadLeagueId: { type: Schema.Types.ObjectId, ref: 'ScadLeague', required: true},
 	salary: { type: Number, required: true },
 	isFranchiseTag: { type: Boolean, required: true },
-	renewSCADLeaguePlayerId: { type: Schema.Types.ObjectId, ref: 'ScadPlayer'},
+	renewScadPlayerId: { type: Schema.Types.ObjectId, ref: 'ScadPlayer'},
+	previousScadPlayerId: { type: Schema.Types.ObjectId, ref: 'ScadPlayer'},
 	previousYearSalary: { type: Number, required: true },
   updated: { type: String },
   created: { type: String }

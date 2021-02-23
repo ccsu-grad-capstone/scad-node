@@ -17,6 +17,6 @@ async function getDashboardDetails(req, res) {
     res.json({ result })
   } catch (error) {
     debug(error)
-    res.status(500).send('An Error Occured Retrieving Scad Team')
+    res.status(500).send('An Error Occured Retrieving Scad Dashboard Details')
   }
 }
