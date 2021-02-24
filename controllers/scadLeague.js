@@ -93,8 +93,6 @@ async function create(scadLeague, access_token) {
   }
 }
 
-// sl = scad league (needing to update)
-// cyg = current yahoo game
 async function renewLeague(id, renewedLeagueId, access_token) {
   debug('renewLeague', id, renewedLeagueId)
 
