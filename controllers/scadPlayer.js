@@ -10,13 +10,25 @@ async function getById(id) {
   return await ScadPlayer.findById(id)
 }
 
-async function getByYahooIds(yahooLeagueId, yahooPlayerId) {
-  return await ScadPlayer.findOne({ yahooPlayerId: yahooPlayerId, yahooLeagueId: yahooLeagueId })
+async function getByYahooIds(gameKey, yahooLeagueId, yahooPlayerId) {
+  // debug(gameKey, yahooLeagueId, yahooPlayerId)
+  let sl = await ScadLeague.findOne({yahooGameKey: gameKey, yahooLeagueId: yahooLeagueId})
+  return await ScadPlayer.findOne({ scadLeagueId: sl._id, yahooPlayerId: yahooPlayerId })
 }
 
 async function getAllByScadLeagueId(id) {
   debug('Getting all ScadPlayers for league scadLeagueId', id)
   return await ScadPlayer.find({ scadLeagueId: id })
+}
+
+async function getAllPlayersByScadLeagueIdWithYahooTeam(id, gameKey, access_token) {
+  debug('Getting all ScadPlayers for league scadLeagueId with yahoo team', id)
+  let scadPlayers = await ScadPlayer.find({ scadLeagueId: id })
+  let yahooPlayers = await yf.getAllLeaguePlayers(access_token, scadPlayers[0].yahooLeagueId)
+
+  for (const sp of scadPlayers) {
+    sp.yahooTeamId = yahoo
+  }
 }
 
 async function getAllByYahooLeagueId(yahooGameKey, yahooLeagueId) {
@@ -60,8 +72,9 @@ async function getAllForTeamByYahooIds(gameKey, yahooLeagueId, yahooTeamId, acce
 async function getScadPlayersFromYahooTeam(yahooTeam, yahooLeagueId) {
   debug('getScadPlayersFromYahooTeam')
   let scadPlayers = []
+  let gameKey = yahooTeam.team_key.split('.')[0]
   for (const yp of yahooTeam.roster) {
-    scadPlayers.push(await getByYahooIds(yahooLeagueId, yp.player_id))
+    scadPlayers.push(await getByYahooIds(gameKey, yahooLeagueId, yp.player_id))
   }
   return scadPlayers
 }
@@ -101,7 +114,9 @@ async function remove(id) {
 
 module.exports = {
   getById,
+  getByYahooIds,
   getAllByScadLeagueId,
+  getAllPlayersByScadLeagueIdWithYahooTeam,
   getAllByYahooLeagueId,
   getMyPlayersByScadId,
   getMyPlayersByYahooId,

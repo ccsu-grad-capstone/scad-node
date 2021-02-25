@@ -88,6 +88,7 @@ async function create(scadLeague, access_token) {
     if (JSON.stringify(error).includes('already exists')) {
       throw error
     } else {
+      debug(error)
       throw 'An Error Occured Creating Scad League'
     }
   }

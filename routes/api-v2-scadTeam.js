@@ -49,12 +49,16 @@ async function update(req, res) {
   const { id } = req.params
   const team = req.body.data
   debug('update SCAD team')
-  try {
-    await scadTeam.update(id, team)
-    res.send('Scad Team updated successfully')
-  } catch (error) {
-    debug(error)
-    res.status(500).send('An Error Occured Updating Scad Team')
+  if (team) {
+    try {
+      await scadTeam.update(id, team)
+      res.send('Scad Team updated successfully')
+    } catch (error) {
+      debug(error)
+      res.status(500).send('An Error Occured Updating Scad Team')
+    }
+  } else {
+    res.status(500).send('No Scad Team supplied with request.')
   }
 }
 

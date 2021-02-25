@@ -280,10 +280,13 @@ function yahooFantasy() {
       yf.setUserToken(access_token)
 
       let result = await yf.user.game_leagues(gameKey)
-
       // Return leagues if they existed, else try to get previous season's leagues
       if (result.games[0].leagues.length > 0) {
-        return result.games[0].leagues
+        let leagues = []
+        for (const league of result.games[0].leagues) {
+          leagues.push(league[0])
+        }
+        return leagues
       } else {
         debug(`Did not find Users Leagues for gameKey: ${gameKey}, ${year}. Getting previous year's leagues.`)
         return await getUserLeaguesByPriorSeason(access_token, year)

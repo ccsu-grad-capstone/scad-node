@@ -1,6 +1,7 @@
 const debug = require('debug')('app:scadDashboardController')
 const scadTeamController = require('./scadTeam')
 const scadPlayerController = require('./scadPlayer')
+const scadLeagueController = require('../controllers/scadLeague')
 const userDefaultLeagueController = require('./userDefaultLeague')
 const usersController = require('./users')
 const yf = require('../services/yahooFantasy')
@@ -17,7 +18,7 @@ async function getDashboardDetails(access_token, idToken) {
     if (udl && udl.yahooGame.game_key === cyg.game_key) {
       // if (false) {
       debug('UDL found and yahooGameKey matches.. retrieving current season league details.')
-      return await getDashboardResponse(access_token, udl.scadLeagueId, false)
+      return await getDashboardResponse(access_token, udl.scadLeagueId._id, false)
 
       // If UDL exists, but yahooGameKey isn't current, we need to..
       // Check if yahooLeague is renew, and renew if so,
@@ -31,12 +32,12 @@ async function getDashboardDetails(access_token, idToken) {
         debug('Previous yahoo league has renew value, meaning we need to renewScadLeague..')
         let renewed = pyl.renewed.split('_')
         let renewedLeagueId = renewed[1]
-        return await getDashboardResponse(access_token, udl.scadLeagueId, renewedLeagueId)
+        return await getDashboardResponse(access_token, udl.scadLeagueId._id, renewedLeagueId)
       } else {
         debug(
           'Previous yahoo league is MISSING league renew value, meaning yahoo league is not renewed yet, retrieving previousSeasonDetails'
         )
-        return await getDashboardResponse(access_token, udl.scadLeagueId, false)
+        return await getDashboardResponse(access_token, udl.scadLeagueId._id, false)
       }
     } else {
       debug('Scad default league not found.  Returning Register Dashboard Details..')
@@ -50,22 +51,23 @@ async function getDashboardDetails(access_token, idToken) {
   }
 }
 
-async function getDashboardResponse(access_token, scadLeague, renewed) {
+async function getDashboardResponse(access_token, scadLeagueId, renewed) {
   debug('getDashboardResponse')
+  let sl = await scadLeagueController.getById(scadLeagueId)
   try {
     return {
       key: 'League',
       renewedAvailable: renewed,
-      scadLeague: scadLeague,
+      scadLeague: sl,
       scadMyTeam: await scadTeamController.getMyTeamByScadLeagueId(
-        scadLeague._id,
+        sl._id,
         access_token,
-        scadLeague.yahooGameKey
+        sl.yahooGameKey
       ),
-      scadMyPlayers: await scadPlayerController.getMyPlayersByScadId(scadLeague._id, access_token),
-      season: scadLeague.seasonYear,
-      yahooLeague: await yf.getLeagueDetails(access_token, 'meta', scadLeague.yahooLeagueId, scadLeague.yahooGameKey),
-      yahooMyTeam: await yf.getMyTeam(access_token, scadLeague.yahooLeagueId, scadLeague.yahooGameKey),
+      scadMyPlayers: await scadPlayerController.getMyPlayersByScadId(sl._id, access_token),
+      season: sl.seasonYear,
+      yahooLeague: await yf.getLeagueDetails(access_token, 'meta', sl.yahooLeagueId, sl.yahooGameKey),
+      yahooMyTeam: await yf.getMyTeam(access_token, sl.yahooLeagueId, sl.yahooGameKey),
     }
   } catch (error) {
     debug('ERR getDashboardResponse', error)

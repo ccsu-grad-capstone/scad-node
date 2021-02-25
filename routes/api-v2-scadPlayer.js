@@ -6,6 +6,7 @@ const scadAuth = require('../utilities/scadAuth')
 const scadPlayerRouter = express.Router()
 
 scadPlayerRouter.get('/:id', scadAuth(), getById)
+scadPlayerRouter.get('/yahoo/:gameKey/:yahooLeagueId/player/:yahooPlayerId', scadAuth(), getByYahooIds)
 scadPlayerRouter.put('/:id', scadAuth(), update)
 scadPlayerRouter.post('/', scadAuth(), create)
 scadPlayerRouter.delete('/:id', scadAuth(), remove)
@@ -20,6 +21,24 @@ async function getById(req, res) {
     res.json({
       scadPlayer: result,
     })
+  } catch (error) {
+    debug(error)
+    res.status(500).send('An Error Occured Retrieving Scad Player')
+  }
+}
+
+async function getByYahooIds(req, res) {
+  const { gameKey, yahooLeagueId, yahooPlayerId } = req.params
+  // debug(id)
+  try {
+    const result = await scadPlayer.getByYahooIds(gameKey, yahooLeagueId, yahooPlayerId)
+    if (result) {
+      res.json({
+        scadPlayer: result,
+      })
+    } else {
+      res.status(404).send('Scad Player Not Found')
+    }
   } catch (error) {
     debug(error)
     res.status(500).send('An Error Occured Retrieving Scad Player')
