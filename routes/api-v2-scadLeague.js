@@ -24,6 +24,7 @@ scadLeagueRouter.get('/:id/team/all', scadAuth(), getAllTeamsByScadLeagueId)
 scadLeagueRouter.get('/yahoo/:gameKey/:yahooLeagueId/team/all', scadAuth(), getAllTeamsByYahooLeagueId)
 scadLeagueRouter.get('/:id/team/myTeam', scadAuth(), getMyTeamByScadLeagueId)
 scadLeagueRouter.get('/yahoo/:gameKey/:yahooLeagueId/team/myTeam', scadAuth(), getMyTeamByYahooLeagueId)
+scadLeagueRouter.get('/:id/yahooTeam/:yahooTeamId', scadAuth(), getTeamByScadLeagueIdYahooTeamId)
 
 // ----- Returning Scad Players -----
 scadLeagueRouter.get('/:id/player/all', scadAuth(), getAllPlayersByScadLeagueId)
@@ -207,6 +208,20 @@ async function getMyTeamByScadLeagueId(req, res) {
     const result = await scadTeam.getMyTeamByScadLeagueId(id, access_token)
     res.json({
       myTeam: result,
+    })
+  } catch (error) {
+    debug(error)
+    res.status(500).send('An Error Occured Retrieving Scad Teams')
+  }
+}
+
+async function getTeamByScadLeagueIdYahooTeamId(req, res) {
+  const { id, yahooTeamId } = req.params
+  debug('getMyTeamByYahooLeagueId', id, yahooTeamId)
+  try {
+    const result = await scadTeam.getTeamByScadLeagueIdYahooTeamId(id, yahooTeamId)
+    res.json({
+      team: result,
     })
   } catch (error) {
     debug(error)

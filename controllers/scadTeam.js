@@ -14,6 +14,11 @@ async function getByYahooIds(yahooLeagueId, yahooTeamId) {
   return await ScadTeam.find({ yahooLeagueId: yahooLeagueId, yahooTeamId: yahooTeamId })
 }
 
+async function getTeamByScadLeagueIdYahooTeamId(scadLeagueId, yahooTeamId) {
+  debug('Getting ScadTeam by YahooIds: ')
+  return await ScadTeam.findOne({ scadLeagueId: scadLeagueId, yahooTeamId: yahooTeamId })
+}
+
 async function getAllByScadLeagueId(id) {
   debug('Getting all ScadTeams for scadLeagueId', id)
   return await ScadTeam.find({ scadLeagueId: id })
@@ -85,6 +90,7 @@ async function remove(id) {
 module.exports = {
   getById,
   getByYahooIds,
+  getTeamByScadLeagueIdYahooTeamId,
   getAllByScadLeagueId,
   getAllByYahooLeagueId,
   getMyTeamByScadLeagueId,

@@ -12,7 +12,7 @@ yahooRouter.get('/league/:yahooLeagueId', scadAuth(), getLeagueMeta)
 yahooRouter.get('/league/:yahooLeagueId/settings', scadAuth(), getLeagueSettings)
 yahooRouter.get('/league/:yahooLeagueId/standings', scadAuth(), getLeagueStandings)
 yahooRouter.get('/league/:yahooLeagueId/teams', scadAuth(), getLeagueTeams)
-yahooRouter.get('/league/team/all', scadAuth(), getAllUsersLeagues)
+yahooRouter.get('/league/get/all', scadAuth(), getAllUsersLeagues)
 yahooRouter.get('/league/:yahooLeagueId/transactions', scadAuth(), getLeagueTransactions)
 yahooRouter.get('/league/:yahooLeagueId/team/:yahooTeamId/roster', scadAuth(), getTeamWithRoster)
 

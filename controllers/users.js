@@ -4,7 +4,7 @@ const yf = require('../services/yahooFantasy')
 const { Base64 } = require('js-base64')
 const axios = require('axios')
 
-async function getUserDetails(idToken) {
+function getUserDetails(idToken) {
   debug('getUserDetails')
   if (idToken) {
     let splitIdToken = idToken.split('.')

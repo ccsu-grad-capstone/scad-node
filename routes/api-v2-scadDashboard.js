@@ -14,6 +14,7 @@ async function getDashboardDetails(req, res) {
   debug('getDashboardDetails')
   try {
     const result = await scadDashboard.getDashboardDetails(access_token, id_token)
+    debug('Returning getDashboardDetails')
     res.json({ result })
   } catch (error) {
     debug(error)
