@@ -2,10 +2,10 @@ const debug = require('debug')('app:TransactionsController')
 
 const Transaction = require('../models/Transaction')
 
-async function get(yahooLeagueId) {
+async function get(yahooGameKey, yahooLeagueId) {
   debug('Get Transaction from Mongo')
   try {
-    return await Transaction.find({ yahooLeagueId: yahooLeagueId }).exec()
+    return await Transaction.find({yahooGameKey: yahooGameKey, yahooLeagueId: yahooLeagueId }).exec()
   } catch (error) {
     throw error
   }

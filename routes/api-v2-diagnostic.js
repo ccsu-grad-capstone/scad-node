@@ -5,7 +5,7 @@ const scadAuth = require('../utilities/scadAuth')
 
 const diagnosticRouter = express.Router()
 
-diagnosticRouter.get('/:yahooLeagueId', scadAuth(), getDiagnostic)
+diagnosticRouter.get('/:yahooGameKey/:yahooLeagueId', scadAuth(), getDiagnostic)
 diagnosticRouter.post('/create', scadAuth(), createDiagnostic)
 diagnosticRouter.put('/update/:id', scadAuth(), updateDiagnostic)
 diagnosticRouter.delete('/:id', scadAuth(), removeDiagnostic)
@@ -13,10 +13,10 @@ diagnosticRouter.delete('/:id', scadAuth(), removeDiagnostic)
 module.exports = diagnosticRouter
 
 async function getDiagnostic(req, res) {
-  const { yahooLeagueId } = req.params
-  debug(yahooLeagueId)
+  const { yahooGameKey, yahooLeagueId } = req.params
+  debug(yahooGameKey, yahooLeagueId)
   try {
-    const result = await diagnostic.get(yahooLeagueId)
+    const result = await diagnostic.get(yahooGameKey, yahooLeagueId)
     res.json({
       data: result,
     })

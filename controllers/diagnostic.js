@@ -2,10 +2,10 @@ const debug = require('debug')('app:diagnosticsController')
 
 const Diagnostic = require('../models/Diagnostic')
 
-async function get(yahooLeagueId) {
+async function get(yahooGameKey, yahooLeagueId) {
   debug('Get diagnostic from Mongo')
   try {
-    return await Diagnostic.find({ yahooLeagueId: yahooLeagueId }).exec()
+    return await Diagnostic.find({ yahooGameKey: yahooGameKey, yahooLeagueId: yahooLeagueId }).exec()
   } catch (error) {
     throw error
   }
