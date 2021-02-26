@@ -6,6 +6,8 @@ const scadPlayerController = require('./scadPlayer')
 const userDefaultLeagueController = require('./userDefaultLeague')
 const transactionController = require('./transaction')
 const diagnosticController = require('./diagnostic')
+const draftPicksController = require('./draftPicks')
+const transactionsController = require('./transactions')
 const yf = require('../services/yahooFantasy')
 
 async function getById(id) {
@@ -53,18 +55,16 @@ async function create(scadLeague, access_token) {
       await scadTeamController.create(st)
 
       // For each Yahoo Team and Manager of team, create a User Default League
+      let yahooGame = await yf.getCurrentYahooGame(access_token)
       for (const manager of yt.managers) {
         if (await userDefaultLeagueController.getByGuid(manager.guid)) {
           debug('User Default League already exists for user ', manager.nickname)
         } else {
-          yahooGame = await yf.getCurrentYahooGame(access_token)
           let udl = {
             yahooGame: yahooGame,
             yahooLeagueId: newScadLeague.yahooLeagueId,
             scadLeagueId: newScadLeague._id,
-            guid: manager.guid,
-            updated: moment().format(),
-            created: moment().format(),
+            guid: manager.guid
           }
           await userDefaultLeagueController.create(udl)
         }
@@ -231,6 +231,8 @@ async function renewLeague(id, renewedLeagueId, access_token) {
     diagnostic.yahooLeagueId = diagnostic.yahooLeagueId
     diagnostic.yahooGameKey = diagnostic.yahooGameKey
     await diagnosticController.update(diagnostic._id, diagnostic)
+
+    let draftPicks = await draftPicksController.getAllByLeague()
 
     debug('Finished renewing SCAD league')
 

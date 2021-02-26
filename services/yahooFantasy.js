@@ -1,7 +1,6 @@
 var YahooFantasy = require('yahoo-fantasy')
 const debug = require('debug')('app:yahooFantasyController')
 const { YAHOO_CLIENT_SECRET, YAHOO_CLIENT_ID } = require('../config')
-const fs = require('fs')
 const GAMEKEYS = {
   current: 'nfl',
   2020: '399',

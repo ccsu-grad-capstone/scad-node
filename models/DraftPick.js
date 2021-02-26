@@ -12,7 +12,7 @@ const DraftPickSchema = new Schema({
   originalTeam: {type: Object},
   player: { type: Number}, 
   comments: { type: String},
-  prevLeagueIds: { type: Array}, 
+  prevLeagueIds: { type: Array }, 
   log: { type: Array }
 });
 
