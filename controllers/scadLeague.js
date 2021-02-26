@@ -4,6 +4,8 @@ const ScadLeague = require('../models/ScadLeague')
 const scadTeamController = require('./scadTeam')
 const scadPlayerController = require('./scadPlayer')
 const userDefaultLeagueController = require('./userDefaultLeague')
+const transactionController = require('./transaction')
+const diagnosticController = require('./diagnostic')
 const yf = require('../services/yahooFantasy')
 
 async function getById(id) {
@@ -82,8 +84,26 @@ async function create(scadLeague, access_token) {
       }
       await scadPlayerController.create(sp)
     }
-
     debug('Finished creating SCAD players')
+
+    // Need to initiate a transaction resource for this league. 
+
+    let transaction = {
+      lastChecked: new Date(),
+      yahooGameKey: newScadLeague.yahooGameKey,
+      yahooLeagueId: newScadLeague.yahooLeagueId,
+      lastTimestamp: ''
+    }
+    await transactionController.create(transaction)
+
+    let diagnostic = {
+      lastChecked: new Date(),
+      yahooGameKey: newScadLeague.yahooGameKey,
+      yahooLeagueId: newScadLeague.yahooLeagueId
+    }
+    await diagnosticController.create(diagnostic)
+
+    debug('Finished creating SCAD league')
   } catch (error) {
     if (JSON.stringify(error).includes('already exists')) {
       throw error
@@ -201,6 +221,16 @@ async function renewLeague(id, renewedLeagueId, access_token) {
       await scadPlayerController.update(sp._id, sp)
     }
     debug('Finished renewing SCAD players')
+
+    let transaction = await transactionController.get(sl.yahooLeagueId)
+    transaction.yahooLeagueId = newScadLeague.yahooLeagueId
+    transaction.yahooGameKey = newScadLeague.yahooGameKey
+    await transactionController.update(transaction._id, transaction)
+
+    let diagnostic = await diagnosticController.get(sl.yahooLeagueId)
+    diagnostic.yahooLeagueId = diagnostic.yahooLeagueId
+    diagnostic.yahooGameKey = diagnostic.yahooGameKey
+    await diagnosticController.update(diagnostic._id, diagnostic)
 
     debug('Finished renewing SCAD league')
 
