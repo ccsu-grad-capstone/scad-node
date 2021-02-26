@@ -6,7 +6,7 @@ const scadTeamController = require('./scadTeam')
 const yf = require('../services/yahooFantasy')
 
 async function getById(id) {
-  debug('Getting ScadPlayer by id: ')
+  debug('Getting ScadPlayer by id:', id)
   return await ScadPlayer.findById(id)
 }
 
@@ -100,7 +100,7 @@ async function update(id, scadPlayer) {
     Object.assign(player, scadPlayer)
     player.updated = moment().format()
     await player.save()
-  
+    debug('Done Updating Player')
     return player
   } else {
     throw ('Player not found.')

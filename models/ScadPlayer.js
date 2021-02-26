@@ -10,6 +10,7 @@ const schema = new Schema({
 	renewScadPlayerId: { type: Schema.Types.ObjectId, ref: 'ScadPlayer'},
 	previousScadPlayerId: { type: Schema.Types.ObjectId, ref: 'ScadPlayer'},
 	previousYearSalary: { type: Number, required: true },
+	history: { type: Array },
   updated: { type: String },
   created: { type: String }
 })
