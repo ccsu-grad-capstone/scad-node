@@ -2,18 +2,18 @@ const debug = require('debug')('app:capExemptionsController')
 
 const CapExemption = require('../models/CapExemption')
 
-async function checkLeague(leagueId, year) {
+async function checkLeague(scadLeagueId) {
   try {
-    return await CapExemption.find({ yahooLeagueId: leagueId, yahooLeagueYear: year })
+    return await CapExemption.find({ scadLeagueId: scadLeagueId })
   } catch (error) {
     throw error
   }
 }
 
-async function getAllByLeague(leagueId, year) {
+async function getAllByLeague(scadLeagueId) {
   debug('Getting all CapExemptions by league: ')
   try {
-    return await CapExemption.find({ yahooLeagueId: leagueId, year: { $gte: year } }).sort({ year: 1 })
+    return await CapExemption.find({ scadLeagueId: scadLeagueId }).sort({ year: 1 })
   } catch (error) {
     throw error
   }
@@ -37,6 +37,21 @@ async function update(id, dp) {
   }
 }
 
+async function updateLeagueCEforLeagueRenewal(update) {
+  const capExceptions = await getAllByLeague(update.oldScadLeagueId, update.year - 1)
+  for (ce of capExceptions) {
+    ce.yahooLeagueId = update.yahooLeagueId
+    ce.yahooGameKey = update.yahooGameKey
+    ce.scadLeagueId = update.scadLeagueId
+    let prev = {
+      year: update.year - 1,
+      scadLeagueId: update.oldScadLeagueId,
+    }
+    ce.prevScadLeagueIds.push(prev)
+    await update(ce._id, ce)
+  }
+}
+
 async function remove(id) {
   debug('Removing CapExemption: ', id)
   try {
@@ -46,4 +61,11 @@ async function remove(id) {
   }
 }
 
-module.exports = { checkLeague, getAllByLeague, create, update, remove }
+module.exports = {
+  checkLeague,
+  getAllByLeague,
+  create,
+  update,
+  updateLeagueCEforLeagueRenewal,
+  remove,
+}

@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const DraftPickSchema = new Schema({
   yahooLeagueId: { type: String, required: true },
-  yahooLeagueYear: { type: Number, required: true },
+  yahooGameKey: { type: String, required: true },
   year: { type: Number, required: true },
   rd: { type: Number, required: true },
   pick: { type: Number },
@@ -12,7 +12,7 @@ const DraftPickSchema = new Schema({
   originalTeam: {type: Object},
   player: { type: Number}, 
   comments: { type: String},
-  prevLeagueIds: { type: Array }, 
+  prevScadLeagueIds: { type: Array }, 
   log: { type: Array }
 });
 

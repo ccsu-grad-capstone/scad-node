@@ -6,21 +6,21 @@ const scadAuth = require('../utilities/scadAuth')
 
 const capExemptionRouter = express.Router()
 
-capExemptionRouter.get('/check/:leagueId/:year', scadAuth(), checkLeague)
-capExemptionRouter.get('/:leagueId/:year', scadAuth(), getAllByLeague)
-capExemptionRouter.get('/:leagueId/:year/:teamId', scadAuth(), getAllByTeam)
+capExemptionRouter.get('/check/:scadLeagueId', scadAuth(), checkLeague)
+capExemptionRouter.get('/:scadLeagueId', scadAuth(), getAllByLeague)
+capExemptionRouter.get('/:scadLeagueId/:yahooTeamId', scadAuth(), getAllByTeam)
 capExemptionRouter.post('/create', scadAuth(), create)
-capExemptionRouter.put('/updateLeague', scadAuth(), updateLeague)
+// capExemptionRouter.put('/updateLeague', scadAuth(), updateLeague)
 capExemptionRouter.put('/:id', scadAuth(), update)
 capExemptionRouter.delete('/remove/:id', scadAuth(), remove)
 
 module.exports = capExemptionRouter
 
 async function checkLeague(req, res) {
-  const { leagueId, year } = req.params
+  const { scadLeagueId } = req.params
   debug('checkLeague')
   try {
-    const result = await capExemptions.checkLeague(leagueId, year)
+    const result = await capExemptions.checkLeague(scadLeagueId)
     if (result.length > 0) {
       res.sendStatus(200)
     } else {
@@ -34,9 +34,9 @@ async function checkLeague(req, res) {
 
 async function getAllByLeague(req, res) {
   debug('getAllByLeague')
-  const { leagueId, year } = req.params
+  const { scadLeagueId } = req.params
   try {
-    const result = await capExemptions.getAllByLeague(leagueId, year)
+    const result = await capExemptions.getAllByLeague(scadLeagueId)
     res.json({
       data: result,
     })
@@ -48,10 +48,10 @@ async function getAllByLeague(req, res) {
 
 async function getAllByTeam(req, res) {
   debug('getAllByTeam')
-  const { leagueId, year, teamId } = req.params
+  const { scadLeagueId, yahooTeamId } = req.params
   try {
-    const result = await capExemptions.getAllByLeague(leagueId, year)
-    let teamCE = result.filter((t) => t.yahooTeamGive.team_id == teamId || t.yahooTeamRecieve.team_id == teamId)
+    const result = await capExemptions.getAllByLeague(scadLeagueId)
+    let teamCE = result.filter((t) => t.yahooTeamGive.team_id == teamId || t.yahooTeamRecieve.team_id == yahooTeamId)
     res.json({
       data: teamCE,
     })
@@ -89,28 +89,17 @@ async function update(req, res) {
   }
 }
 
-async function updateLeague(req, res) {
-  const update = req.body.data
-  debug('updateLeague')
-  try {
-    const capExceptions = await capExemptions.getAllByLeague(update.oldId, update.year - 1)
-
-    for (ce of capExceptions) {
-      ce.yahooLeagueId = update.newId
-      ce.yahooLeagueYear = update.year
-      let prev = {
-        year: update.year - 1,
-        yahooLeagueId: update.oldId,
-      }
-      ce.prevLeagueIds.push(prev)
-      await capExemptions.update(ce._id, ce)
-    }
-    res.send('Retrieved and updated Cap Exemptions Successfully')
-  } catch (error) {
-    debug(error)
-    res.status(500).send('An Error Occured Retrieving Cap Exemptions')
-  }
-}
+// async function updateLeague(req, res) {
+//   const update = req.body.data
+//   debug('updateLeague')
+//   try {
+//     await capExemptions.updateLeagueCEforLeagueRenewal(update)
+//     res.send('Retrieved and updated Cap Exemptions Successfully')
+//   } catch (error) {
+//     debug(error)
+//     res.status(500).send('An Error Occured Retrieving Cap Exemptions')
+//   }
+// }
 
 async function remove(req, res) {
   const { id } = req.params

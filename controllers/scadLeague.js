@@ -7,8 +7,9 @@ const userDefaultLeagueController = require('./userDefaultLeague')
 const transactionController = require('./transaction')
 const diagnosticController = require('./diagnostic')
 const draftPicksController = require('./draftPicks')
-const transactionsController = require('./transactions')
+const capExemptionController = require('./capExemptions')
 const yf = require('../services/yahooFantasy')
+const capExemptionRouter = require('../routes/api-v2-capExemptions')
 
 async function getById(id) {
   debug('Getting ScadLeague by id:', id)
@@ -102,6 +103,30 @@ async function create(scadLeague, access_token) {
       yahooLeagueId: newScadLeague.yahooLeagueId
     }
     await diagnosticController.create(diagnostic)
+
+    // NEED TO CREATE DRAFT PICKS.. CODE PULLED FROM UI
+    // referenceData.draftPickYears(year).forEach(y => {
+    //   referenceData.draftPickRounds(rootState.league.scadSettings.rookieDraftRds).forEach(r => {
+    //     rootState.league.yahooTeams.forEach(async t => {
+    //       let draftPick = {
+    //         yahooLeagueId: yahooLeagueId,
+    //         yahooGameKey: rootState.league.gameKey,
+    //         scadLeagueId: rootState.league.scadLeagueId,
+    //         year: y,
+    //         rd: r,
+    //         pick: undefined,
+    //         salary: undefined,
+    //         playerId: undefined,
+    //         team: t,
+    //         originalTeam: t,
+    //         comments: '',
+    //         prevScadLeagueIds: [],
+    //         log: []
+    //       }
+    //       await node.post('/draftPicks/create', { data: draftPick })
+    //     })
+    //   })
+    // })
 
     debug('Finished creating SCAD league')
   } catch (error) {
@@ -232,7 +257,15 @@ async function renewLeague(id, renewedLeagueId, access_token) {
     diagnostic.yahooGameKey = diagnostic.yahooGameKey
     await diagnosticController.update(diagnostic._id, diagnostic)
 
-    let draftPicks = await draftPicksController.getAllByLeague()
+    let update = {
+      oldScadLeagueId: newScadLeague.previousScadLeagueId,
+      year: newScadLeague.seasonYear,
+      yahooLeagueId: newScadLeague.yahooLeagueId,
+      yahooGameKey: newScadLeague.yahooGameKey,
+      scadLeagueId: newScadLeague._id
+    }
+    await draftPicksController.updateLeagueDPforLeagueRenewal(update)
+    await capExemptionController.updateLeagueCEforLeagueRenewal(update)
 
     debug('Finished renewing SCAD league')
 

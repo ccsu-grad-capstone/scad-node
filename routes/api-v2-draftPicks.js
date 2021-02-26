@@ -5,21 +5,21 @@ const scadAuth = require('../utilities/scadAuth')
 
 const draftPicksRouter = express.Router()
 
-draftPicksRouter.get('/check/:leagueId/:year', scadAuth(), checkLeague)
-draftPicksRouter.get('/:leagueId/:year', scadAuth(), getAllByLeague)
-draftPicksRouter.get('/:leagueId/:year/:teamId', scadAuth(), getAllByTeam)
+draftPicksRouter.get('/check/:scadLeagueId', scadAuth(), checkLeague)
+draftPicksRouter.get('/:scadLeagueId', scadAuth(), getAllByLeague)
+draftPicksRouter.get('/:scadLeagueId/:yahooTeamId', scadAuth(), getAllByTeam)
 draftPicksRouter.post('/create', scadAuth(), create)
-draftPicksRouter.put('/updateLeague', scadAuth(), updateLeague)
+// draftPicksRouter.put('/updateLeague', scadAuth(), updateLeague)
 draftPicksRouter.put('/:id', scadAuth(), update)
 draftPicksRouter.delete('/remove:id', scadAuth(), remove)
 
 module.exports = draftPicksRouter
 
 async function checkLeague(req, res) {
-  const { leagueId, year } = req.params
+  const { scadLeagueId } = req.params
   debug(leagueId)
   try {
-    const result = await draftPicks.checkLeague(leagueId, year)
+    const result = await draftPicks.checkLeague(scadLeagueId)
     if (result.length > 0) {
       res.sendStatus(200)
     } else {
@@ -32,10 +32,10 @@ async function checkLeague(req, res) {
 }
 
 async function getAllByLeague(req, res) {
-  const { leagueId, year } = req.params
+  const { scadLeagueId } = req.params
   debug(leagueId)
   try {
-    const result = await draftPicks.getAllByLeague(leagueId, year, 180)
+    const result = await draftPicks.getAllByLeague(scadLeagueId, 180)
     res.json({
       data: result,
     })
@@ -46,11 +46,11 @@ async function getAllByLeague(req, res) {
 }
 
 async function getAllByTeam(req, res) {
-  const { leagueId, year, teamId } = req.params
+  const { scadLeagueId, yahooTeamId } = req.params
   debug(leagueId, year, teamId)
   try {
-    const result = await draftPicks.getAllByLeague(leagueId, year, 180)
-    let teamPicks = result.filter((t) => t.team.team_id == teamId)
+    const result = await draftPicks.getAllByLeague(scadLeagueId, 180)
+    let teamPicks = result.filter((t) => t.team.team_id == yahooTeamId)
 
     res.json({
       data: teamPicks,
@@ -89,28 +89,17 @@ async function update(req, res) {
   }
 }
 
-async function updateLeague(req, res) {
-  const update = req.body.data
-  debug('updateLeague', update)
-  try {
-    const picks = await draftPicks.getAllByLeague(update.oldId, update.year - 1)
-
-    for (p of picks) {
-      p.yahooLeagueId = update.newId
-      p.yahooLeagueYear = update.year
-      let prev = {
-        year: update.year - 1,
-        yahooLeagueId: update.oldId,
-      }
-      p.prevLeagueIds.push(prev)
-      await draftPicks.update(p._id, p)
-    }
-    res.send('Retrieved and Updated Draft Picks Successfully')
-  } catch (error) {
-    debug(error)
-    res.status(500).send('An Error Occured Updating Draft Picks')
-  }
-}
+// async function updateLeague(req, res) {
+//   const update = req.body.data
+//   debug('updateLeague', update)
+//   try {
+//     await draftPicks.updateLeagueDPforLeagueRenewal(update)
+//     res.send('Retrieved and Updated Draft Picks Successfully')
+//   } catch (error) {
+//     debug(error)
+//     res.status(500).send('An Error Occured Updating Draft Picks')
+//   }
+// }
 
 async function remove(req, res) {
   const { id } = req.params

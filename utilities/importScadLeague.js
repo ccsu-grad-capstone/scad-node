@@ -21,11 +21,11 @@ export async function importLeague(access_token, leagueObj) {
   }
 
   for (const dp of leagueObj.draftPicks) {
-    await draftPicksController.create(prepDraftPick(dp))
+    await draftPicksController.create(prepDraftPick(dp, sl._id, sl.yahooGameKey))
   }
 
   for (const ce of leagueObj.capExemptions) {
-    await capExemptionsController.create(prepCapExemptions(ce))
+    await capExemptionsController.create(prepCapExemptions(ce, sl._id, sl.yahooGameKey))
   }
 
   await diagnosticController.create(prepDiagnostic(leagueObj.diagnostic, sl._id))
@@ -102,11 +102,12 @@ function prepPlayer(player, slid) {
   }
 }
 
-function prepDraftPick(dp) {
+function prepDraftPick(dp, slid, yahooGameKey) {
   return {
     prevLeagueIds: dp.prevLeagueIds,
     yahooLeagueId: dp.yahooLeagueYear,
-    yahooLeagueYear: dp.yahooLeagueYear,
+    yahooGameKey: yahooGameKey,
+    scadLeagueId: slid,
     year: dp.year,
     rd: dp.rd,
     team: dp.team,
@@ -117,11 +118,12 @@ function prepDraftPick(dp) {
   }
 }
 
-function prepCapExemptions(ce) {
+function prepCapExemptions(ce, slid, yahooGameKey) {
   return {
     prevLeagueIds: ce.prevLeagueIds,
     yahooLeagueId: ce.yahooLeagueId,
-    yahooLeagueYear: ce.yahooLeagueYear,
+    yahooGameKey: yahooGameKey,
+    scadLeagueId: slid,
     year: ce.year,
     timestamp: ce.timestamp,
     addedBy: ce.addedBy,
@@ -129,7 +131,7 @@ function prepCapExemptions(ce) {
     yahooTeamRecieve: ce.yahooTeamRecieve,
     amount: ce.amount,
     appliedToTeams: ce.appliedToTeams,
-    comments: '',
+    comments: ce.comments,
   }
 }
 
