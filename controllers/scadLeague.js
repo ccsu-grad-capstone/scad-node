@@ -9,7 +9,6 @@ const diagnosticController = require('./diagnostic')
 const draftPicksController = require('./draftPicks')
 const capExemptionController = require('./capExemptions')
 const yf = require('../services/yahooFantasy')
-const capExemptionRouter = require('../routes/api-v2-capExemptions')
 
 async function getById(id) {
   debug('Getting ScadLeague by id:', id)
@@ -65,7 +64,7 @@ async function create(scadLeague, access_token) {
             yahooGame: yahooGame,
             yahooLeagueId: newScadLeague.yahooLeagueId,
             scadLeagueId: newScadLeague._id,
-            guid: manager.guid
+            guid: manager.guid,
           }
           await userDefaultLeagueController.create(udl)
         }
@@ -87,46 +86,47 @@ async function create(scadLeague, access_token) {
     }
     debug('Finished creating SCAD players')
 
-    // Need to initiate a transaction resource for this league. 
+    // Need to initiate a transaction resource for this league.
 
     let transaction = {
       lastChecked: new Date(),
       yahooGameKey: newScadLeague.yahooGameKey,
       yahooLeagueId: newScadLeague.yahooLeagueId,
-      lastTimestamp: ''
+      lastTimestamp: '',
     }
     await transactionController.create(transaction)
 
     let diagnostic = {
       lastChecked: new Date(),
       yahooGameKey: newScadLeague.yahooGameKey,
-      yahooLeagueId: newScadLeague.yahooLeagueId
+      yahooLeagueId: newScadLeague.yahooLeagueId,
     }
     await diagnosticController.create(diagnostic)
 
-    // NEED TO CREATE DRAFT PICKS.. CODE PULLED FROM UI
-    // referenceData.draftPickYears(year).forEach(y => {
-    //   referenceData.draftPickRounds(rootState.league.scadSettings.rookieDraftRds).forEach(r => {
-    //     rootState.league.yahooTeams.forEach(async t => {
-    //       let draftPick = {
-    //         yahooLeagueId: yahooLeagueId,
-    //         yahooGameKey: rootState.league.gameKey,
-    //         scadLeagueId: rootState.league.scadLeagueId,
-    //         year: y,
-    //         rd: r,
-    //         pick: undefined,
-    //         salary: undefined,
-    //         playerId: undefined,
-    //         team: t,
-    //         originalTeam: t,
-    //         comments: '',
-    //         prevScadLeagueIds: [],
-    //         log: []
-    //       }
-    //       await node.post('/draftPicks/create', { data: draftPick })
-    //     })
-    //   })
-    // })
+    debug('Creating Draft Picks for league..')
+    for (let y = 0; y < 10; y++) {
+      for (let r = 0; r < newScadLeague.rookieDraftRds; r++) {
+        for (const team of yahooTeams) {
+          let draftPick = {
+            yahooLeagueId: newScadLeague.yahooLeagueId,
+            yahooGameKey: newScadLeague.yahooGameKey,
+            scadLeagueId: newScadLeague._id,
+            year: newScadLeague.seasonYear + y,
+            rd: r + 1,
+            pick: undefined,
+            salary: undefined,
+            playerId: undefined,
+            team: team,
+            originalTeam: team,
+            comments: '',
+            prevScadLeagueIds: [],
+            log: [],
+          }
+          await draftPicksController.create(draftPick)
+        }
+      }
+    }
+    debug('Finished creating Draft Picks for league..')
 
     debug('Finished creating SCAD league')
   } catch (error) {
@@ -156,13 +156,13 @@ async function renewLeague(id, renewedLeagueId, access_token) {
 
     let season = sl.seasonYear + 1
 
-    let nsl = { 
+    let nsl = {
       yahooLeagueId: renewedLeagueId,
       seasonYear: season,
       leagueManagers: sl.leagueManagers,
       rookieDraftRds: sl.rookieDraftRds,
       rookieDraftStrategy: sl.rookieDraftStrategy,
-      rookieWageScale: sl.rookieWageScale ,
+      rookieWageScale: sl.rookieWageScale,
       teamSalaryCap: sl.teamSalaryCap,
       leagueSalaryCap: sl.leagueSalaryCap,
       salaryCapExemptionLimit: sl.salaryCapExemptionLimit,
@@ -218,13 +218,13 @@ async function renewLeague(id, renewedLeagueId, access_token) {
       await scadTeamController.update(st._id, st)
     }
     debug('Finished renewing SCAD teams')
-    
+
     debug('For each UDL that matches renewed league, update UDL.')
     for (const udl of udls) {
       udl.yahooGame = cyg
       udl.yahooLeagueId = newScadLeague.yahooLeagueId
       udl.scadLeagueId = newScadLeague._id
-      
+
       await userDefaultLeagueController.update(udl.guid, udl)
     }
     debug('Finished updating User Default Leagues')
@@ -238,7 +238,7 @@ async function renewLeague(id, renewedLeagueId, access_token) {
         salary: sp.salary,
         isFranchiseTag: false,
         previousYearSalary: sp.salary,
-        previousScadPlayerId: sp._id
+        previousScadPlayerId: sp._id,
       }
       nsp = await scadPlayerController.create(nsp)
 
@@ -262,13 +262,12 @@ async function renewLeague(id, renewedLeagueId, access_token) {
       year: newScadLeague.seasonYear,
       yahooLeagueId: newScadLeague.yahooLeagueId,
       yahooGameKey: newScadLeague.yahooGameKey,
-      scadLeagueId: newScadLeague._id
+      scadLeagueId: newScadLeague._id,
     }
     await draftPicksController.updateLeagueDPforLeagueRenewal(update)
     await capExemptionController.updateLeagueCEforLeagueRenewal(update)
 
     debug('Finished renewing SCAD league')
-
   } catch (error) {
     if (JSON.stringify(error).includes('already exists')) {
       debug('ERR renewLeague', error)

@@ -17,7 +17,7 @@ module.exports = draftPicksRouter
 
 async function checkLeague(req, res) {
   const { scadLeagueId } = req.params
-  debug(leagueId)
+  debug(scadLeagueId)
   try {
     const result = await draftPicks.checkLeague(scadLeagueId)
     if (result.length > 0) {
@@ -33,7 +33,7 @@ async function checkLeague(req, res) {
 
 async function getAllByLeague(req, res) {
   const { scadLeagueId } = req.params
-  debug(leagueId)
+  debug(scadLeagueId)
   try {
     const result = await draftPicks.getAllByLeague(scadLeagueId, 180)
     res.json({
@@ -47,7 +47,7 @@ async function getAllByLeague(req, res) {
 
 async function getAllByTeam(req, res) {
   const { scadLeagueId, yahooTeamId } = req.params
-  debug(leagueId, year, teamId)
+  debug(scadLeagueId, yahooTeamId)
   try {
     const result = await draftPicks.getAllByLeague(scadLeagueId, 180)
     let teamPicks = result.filter((t) => t.team.team_id == yahooTeamId)

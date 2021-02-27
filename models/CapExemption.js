@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const CapExemptionSchema = new Schema({
   yahooLeagueId: { type: String, required: true },
   yahooGameKey: { type: Number, required: true },
+	scadLeagueId: { type: Schema.Types.ObjectId, ref: 'ScadLeague', required: true},
   year: { type: String, required: true},  
   timestamp: { type: Date, required: true},
   addedBy: { type: String },
