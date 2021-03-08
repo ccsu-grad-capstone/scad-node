@@ -4,6 +4,7 @@ const scadTeam = require('../controllers/scadTeam')
 const scadPlayer = require('../controllers/scadPlayer')
 const debug = require('debug')('app:scadLeagueRouter')
 const scadAuth = require('../utilities/scadAuth')
+const { importScadLeague } = require('../utilities/importScadLeague')
 
 const scadLeagueRouter = express.Router()
 
@@ -12,6 +13,7 @@ scadLeagueRouter.get('/:id', scadAuth(), getById)
 scadLeagueRouter.get('/yahoo/:gameKey/:yahooLeagueId', scadAuth(), getByYahooLeagueId)
 scadLeagueRouter.put('/:id', scadAuth(), update)
 scadLeagueRouter.post('/', scadAuth(), create)
+scadLeagueRouter.post('/import', scadAuth(), importLeague)
 scadLeagueRouter.post('/:id/renew/:renewedLeagueId', scadAuth(), renewLeague)
 scadLeagueRouter.delete('/:id', scadAuth(), remove)
 scadLeagueRouter.get('/get/all', scadAuth(), getAll)
@@ -75,6 +77,18 @@ async function getByYahooLeagueId(req, res) {
   }
 }
 
+async function importLeague(req, res) {
+  debug('importLeague')
+  const { access_token } = req.headers
+  try {
+    await importScadLeague(access_token)
+    res.send('Scad League Imported successfully')
+  } catch (error) {
+    debug(error)
+    res.status(500).send(error)
+  }
+}
+
 async function create(req, res) {
   debug('create')
   const league = req.body.data
@@ -119,7 +133,7 @@ async function update(req, res) {
       let result = await scadLeague.update(id, league)
       res.send({
         message: 'Scad League Updated Successfully',
-        league: result
+        league: result,
       })
     } catch (error) {
       debug(error)

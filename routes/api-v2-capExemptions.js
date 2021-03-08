@@ -51,7 +51,7 @@ async function getAllByTeam(req, res) {
   const { scadLeagueId, yahooTeamId } = req.params
   try {
     const result = await capExemptions.getAllByLeague(scadLeagueId)
-    let teamCE = result.filter((t) => t.yahooTeamGive.team_id == teamId || t.yahooTeamRecieve.team_id == yahooTeamId)
+    let teamCE = result.filter((t) => t.yahooTeamGive.team_id == yahooTeamId || t.yahooTeamRecieve.team_id == yahooTeamId)
     res.json({
       data: teamCE,
     })
