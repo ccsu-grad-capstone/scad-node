@@ -33,7 +33,8 @@ const httpsPort = 3001
 
 // MongoDB config
 var uri = DB_URI
-mongoose.connect(`${uri}`, { useNewUrlParser: true, useUnifiedTopology: true })
+console.log('DB_URI:', uri)
+mongoose.connect(process.env.DB_URI || uri, { useNewUrlParser: true, useUnifiedTopology: true })
 mongoose.connection.on('connected', () => debug(`Successfully connected to database from ${uri}`))
 mongoose.connection.on('disconnected', () => debug('Database disconnected..'))
 mongoose.connection.on('error', () => debug('Could not connect to database'))
