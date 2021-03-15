@@ -65,7 +65,7 @@ app.use('/scad/dashboard', scadDashboard)
 app.use('/user', user)
 
 app.get('/', (req, res) => {
-  res.redirect(`${VUE_APP_UI}/about`)
+  res.send("SCAD-SERVER SUCCESSFUL!")
 })
 
 var key = fs.readFileSync('./certificates/selfsigned.key');
