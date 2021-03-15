@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "DEBUG=app,app:* node server.js",
+    "start": "DEBUG=app,app:* node app.js",
     "serve": "DEBUG=app,app:* nodemon app.js"
   },
   "dependencies": {
