@@ -20,7 +20,7 @@ function yahooController(service) {
       // debug(`refresh_token: ${tokens.refresh_token}`)
       // debug(`idtoken: ${tokens.idtoken}`)
       // res.send(tokens)
-      res.redirect(`${VUE_APP_UI}/dashboard?access_token=${tokens.accesstoken}&refresh_token=${tokens.refresh_token}&id_token=${tokens.idtoken}`)
+      res.redirect(`${VUE_APP_UI}/dashboard?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}&id_token=${tokens.id_token}`)
     } catch (err) {
       debug(err.stack)
     }

@@ -18,7 +18,6 @@ function getUserDetails(idToken) {
 async function getUserGuid (idToken) {
   debug('getUserGuid')
   const user = await getUserDetails(idToken)
-  debug('user', user)
   return user.guid
 }
 

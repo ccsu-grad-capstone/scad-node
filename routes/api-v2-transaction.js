@@ -15,7 +15,7 @@ module.exports = transactionRouter
 
 async function getTransaction(req, res) {
   const { yahooGameKey, yahooLeagueId } = req.params
-  debug(yahooGameKey, yahooLeagueId)
+  debug('getTransaction')
   try {
     const result = await transaction.get(yahooGameKey, yahooLeagueId)
     res.json({
