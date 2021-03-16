@@ -21,7 +21,7 @@ const { importDiagnostics } = require('./importData/diagnostics')
 
 const yf = require('../services/yahooFantasy')
 
-async function importScadLeague(access_token) {
+async function importScadLeague(accesstoken) {
   const leagueObj = {
     league: importLeague,
     teams: importTeams,
@@ -64,8 +64,8 @@ async function importScadLeague(access_token) {
   await transactionController.create(prepTransaction(leagueObj.transaction, sl._id, sl.yahooGameKey))
   debug('Transactions Created')
   
-  let yahooTeams = await yf.getLeagueDetails(access_token, 'teams', sl.yahooLeagueId, sl.yahooGameKey)
-  let yahooGame = await yf.getCurrentYahooGame(access_token)
+  let yahooTeams = await yf.getLeagueDetails(accesstoken, 'teams', sl.yahooLeagueId, sl.yahooGameKey)
+  let yahooGame = await yf.getCurrentYahooGame(accesstoken)
   
   for (const yt of yahooTeams) {
     for (const manager of yt.managers) {

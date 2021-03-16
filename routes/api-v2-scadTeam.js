@@ -76,10 +76,10 @@ async function remove(req, res) {
 
 async function getAllTeamPlayersByScadTeamId(req, res) {
   const { id } = req.params
-  const { access_token } = req.headers
+  const { accesstoken } = req.headers
   debug(id)
   try {
-    const result = await scadPlayer.getAllTeamPlayersByScadTeamId(id, access_token)
+    const result = await scadPlayer.getAllTeamPlayersByScadTeamId(id, accesstoken)
     res.json({
       scadPlayers: result,
     })

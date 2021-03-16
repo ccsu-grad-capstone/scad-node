@@ -20,7 +20,7 @@ async function getByYahooLeagueId(gameKey, yahooLeagueId) {
   return await ScadLeague.findOne({ yahooGameKey: gameKey, yahooLeagueId: yahooLeagueId })
 }
 
-async function create(scadLeague, access_token) {
+async function create(scadLeague, accesstoken) {
   try {
     debug('Creating new ScadLeague')
 
@@ -32,14 +32,14 @@ async function create(scadLeague, access_token) {
 
     // Create and save SCAD league to db
     const newScadLeague = new ScadLeague(scadLeague)
-    const currentYahooGame = await yf.getCurrentYahooGame(access_token)
+    const currentYahooGame = await yf.getCurrentYahooGame(accesstoken)
     newScadLeague.yahooGameKey = currentYahooGame.game_key
     newScadLeague.created = moment().format()
     newScadLeague.updated = moment().format()
     await newScadLeague.save()
 
-    const yahooTeams = await yf.getCurrentSeasonLeagueDetails(access_token, 'teams', scadLeague.yahooLeagueId)
-    const yahooLeaguePlayers = await yf.getAllLeaguePlayers(access_token, scadLeague.yahooLeagueId)
+    const yahooTeams = await yf.getCurrentSeasonLeagueDetails(accesstoken, 'teams', scadLeague.yahooLeagueId)
+    const yahooLeaguePlayers = await yf.getAllLeaguePlayers(accesstoken, scadLeague.yahooLeagueId)
 
     for (const yt of yahooTeams) {
       // For each Yahoo Team, create a SCAD team..
@@ -55,7 +55,7 @@ async function create(scadLeague, access_token) {
       await scadTeamController.create(st)
 
       // For each Yahoo Team and Manager of team, create a User Default League
-      let yahooGame = await yf.getCurrentYahooGame(access_token)
+      let yahooGame = await yf.getCurrentYahooGame(accesstoken)
       for (const manager of yt.managers) {
         if (await userDefaultLeagueController.getByGuid(manager.guid)) {
           debug('User Default League already exists for user ', manager.nickname)
@@ -139,11 +139,11 @@ async function create(scadLeague, access_token) {
   }
 }
 
-async function renewLeague(id, renewedLeagueId, access_token) {
+async function renewLeague(id, renewedLeagueId, accesstoken) {
   debug('renewLeague', id, renewedLeagueId)
 
   const sl = await getById(id)
-  const cyg = await yf.getCurrentYahooGame(access_token)
+  const cyg = await yf.getCurrentYahooGame(accesstoken)
 
   try {
     // Check if SCAD league already exists for YahooLeagueId

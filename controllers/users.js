@@ -18,7 +18,7 @@ function getUserDetails(idToken) {
 async function getUserGuid (idToken) {
   debug('getUserGuid')
   const user = await getUserDetails(idToken)
-  console.log('user', user)
+  debug('user', user)
   return user.guid
 }
 

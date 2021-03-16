@@ -30,26 +30,26 @@ async function getAllByYahooLeagueId(yahooGameKey, yahooLeagueId) {
   return await ScadTeam.find({ scadLeagueId: sl._id })
 }
 
-async function getMyTeamByScadLeagueId(id, access_token, yahooGameKey) {
+async function getMyTeamByScadLeagueId(id, accesstoken, yahooGameKey) {
   debug('Getting my ScadTeam for scadLeagueId', id)
 
   const scadLeagueTeams = await getAllByScadLeagueId(id)
   let myYahooTeams
   if (!yahooGameKey) {
-    let yg = await yf.getCurrentYahooGame(access_token)
-    myYahooTeams = await yf.getMyTeams(access_token, yg.game_key)
+    let yg = await yf.getCurrentYahooGame(accesstoken)
+    myYahooTeams = await yf.getMyTeams(accesstoken, yg.game_key)
   } else {
-    myYahooTeams = await yf.getMyTeams(access_token, yahooGameKey)
+    myYahooTeams = await yf.getMyTeams(accesstoken, yahooGameKey)
   }
   let yahooTeam = myYahooTeams.find((yt) => yt.team_key.includes(scadLeagueTeams[0].yahooLeagueId))
   return scadLeagueTeams.find((st) => st.yahooTeamId === yahooTeam.team_id)
 }
 
-async function getMyTeamByYahooLeagueId(yahooGameKey, yahooLeagueId, access_token) {
+async function getMyTeamByYahooLeagueId(yahooGameKey, yahooLeagueId, accesstoken) {
   debug('Getting my ScadTeam for yahooLeagueId', yahooGameKey, yahooLeagueId)
 
   const scadLeagueTeams = await getAllByYahooLeagueId(yahooGameKey, yahooLeagueId)
-  const myYahooTeam = await yf.getMyTeam(access_token, yahooLeagueId, yahooGameKey)
+  const myYahooTeam = await yf.getMyTeam(accesstoken, yahooLeagueId, yahooGameKey)
 
   return scadLeagueTeams.find((st) => st.yahooTeamId === myYahooTeam.team_id)
 }
