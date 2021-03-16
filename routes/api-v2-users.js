@@ -12,6 +12,7 @@ module.exports = userRouter
 
 async function getUser(req, res) {
   debug('getUser')
+  debug(req.headers)
   const { idtoken } = req.headers
   try {
     let result = await userController.getUserDetails(idtoken)
