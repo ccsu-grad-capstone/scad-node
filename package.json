@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "DEBUG=app,app:* node app.js",
     "serve": "DEBUG=app,app:* nodemon app.js"
   },
   "dependencies": {
@@ -22,9 +22,10 @@
     "firebase-admin": "^8.13.0",
     "firebase-functions": "^3.11.0",
     "http-errors": "~1.6.3",
+    "js-base64": "^3.6.0",
     "lodash": "^4.17.20",
-    "moment": "^2.27.0",
-    "mongoose": "^5.10.3",
+    "moment": "^2.28.0",
+    "mongoose": "^5.10.5",
     "morgan": "^1.9.1",
     "nodemon": "^2.0.4",
     "passport": "^0.4.0",
@@ -41,10 +42,7 @@
     "delay": "1500",
     "env": {
       "NODE_ENV": "development",
-      "PORT": "3000"
+      "PORT": "4000"
     }
-  },
-  "engines": {
-    "node": ">=8.0.0 <11.0.0"
   }
 }

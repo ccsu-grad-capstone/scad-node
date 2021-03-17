@@ -10,11 +10,18 @@ const fs = require('fs')
 const http = require('http');
 const https = require('https')
 
-const authRouter = require('./routes/authRouter')
-const draftPicks = require('./routes/draftPicks-route')
-const capExemptions = require('./routes/capExemptions-route')
-const transaction = require('./routes/transaction-route')
-const diagnostic = require('./routes/diagnostic-route')
+const authRouter = require('./routes/api-v2-authRouter')
+const draftPicks = require('./routes/api-v2-draftPicks')
+const capExemptions = require('./routes/api-v2-capExemptions')
+const transaction = require('./routes/api-v2-transaction')
+const player = require('./routes/api-v2-players')
+const diagnostic = require('./routes/api-v2-diagnostic')
+const yahoo = require('./routes/api-v2-yahoo')
+const scadLeague = require('./routes/api-v2-scadLeague')
+const scadTeam = require('./routes/api-v2-scadTeam')
+const scadPlayer = require('./routes/api-v2-scadPlayer')
+const scadDashboard = require('./routes/api-v2-scadDashboard')
+const user = require('./routes/api-v2-users')
 const dotenv = require('dotenv')
 const { inDevelopment } = require('./utilities/enviornment')
 const { DB_URI, VUE_APP_UI } = require('./config')
@@ -26,7 +33,8 @@ const httpsPort = 3001
 
 // MongoDB config
 var uri = DB_URI
-mongoose.connect(`${uri}`, { useNewUrlParser: true, useUnifiedTopology: true })
+console.log('DB_URI:', uri)
+mongoose.connect(process.env.DB_URI || uri, { useNewUrlParser: true, useUnifiedTopology: true })
 mongoose.connection.on('connected', () => debug(`Successfully connected to database from ${uri}`))
 mongoose.connection.on('disconnected', () => debug('Database disconnected..'))
 mongoose.connection.on('error', () => debug('Could not connect to database'))
@@ -47,10 +55,17 @@ app.use('/auth', authRouter)
 app.use('/draftPicks', draftPicks)
 app.use('/capExemptions', capExemptions)
 app.use('/transaction', transaction)
+app.use('/player', player)
 app.use('/diagnostic', diagnostic)
+app.use('/yahoo', yahoo)
+app.use('/scad/league', scadLeague)
+app.use('/scad/team', scadTeam)
+app.use('/scad/player', scadPlayer)
+app.use('/scad/dashboard', scadDashboard)
+app.use('/user', user)
 
 app.get('/', (req, res) => {
-  res.redirect(`${VUE_APP_UI}/about`)
+  res.send("SCAD-SERVER SUCCESSFUL!")
 })
 
 var key = fs.readFileSync('./certificates/selfsigned.key');

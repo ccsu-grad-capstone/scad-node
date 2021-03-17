@@ -19,7 +19,6 @@ function yahooOauth() {
     return new Promise((resolve, reject) => {
       axios(options)
         .then(response => {
-          resolve(response.data)
           if (response.status === 200) {
             resolve(response.data)
           } else {
@@ -29,7 +28,7 @@ function yahooOauth() {
         })
         .catch(error => {
           reject(error)
-          debug(error.response.data)
+          debug(error.response)
         })
     })
   }
@@ -45,7 +44,6 @@ function yahooOauth() {
     return new Promise((resolve, reject) => {
       axios(options)
         .then(response => {
-          resolve(response.data)
           if (response.status === 200) {
             resolve(response.data)
           } else {
@@ -55,7 +53,7 @@ function yahooOauth() {
         })
         .catch(error => {
           reject(error)
-          debug(error.response.data)
+          debug(error.response)
         })
     })
   }
