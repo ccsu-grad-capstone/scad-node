@@ -21,16 +21,6 @@ async function getAllByScadLeagueId(id) {
   return await ScadPlayer.find({ scadLeagueId: id })
 }
 
-async function getAllPlayersByScadLeagueIdWithYahooTeam(id, gameKey, accesstoken) {
-  debug('Getting all ScadPlayers for league scadLeagueId with yahoo team', id)
-  let scadPlayers = await ScadPlayer.find({ scadLeagueId: id })
-  let yahooPlayers = await yf.getAllLeaguePlayers(accesstoken, scadPlayers[0].yahooLeagueId)
-
-  for (const sp of scadPlayers) {
-    sp.yahooTeamId = yahoo
-  }
-}
-
 async function getAllByYahooLeagueId(yahooGameKey, yahooLeagueId) {
   debug('Getting all ScadPlayers for league by yahooLeagueId', yahooGameKey, yahooLeagueId)
   let sl = await ScadLeague.findOne({ yahooGameKey: yahooGameKey, yahooLeagueId: yahooLeagueId })
@@ -116,7 +106,6 @@ module.exports = {
   getById,
   getByYahooIds,
   getAllByScadLeagueId,
-  getAllPlayersByScadLeagueIdWithYahooTeam,
   getAllByYahooLeagueId,
   getMyPlayersByScadId,
   getMyPlayersByYahooId,

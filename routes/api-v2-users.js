@@ -21,6 +21,6 @@ async function getUser(req, res) {
     })
   } catch (error) {
     debug(error)
-    res.status(500).send(error)
+    res.status(500).send('An Error Occured Retrieving User Info')
   }
 }
