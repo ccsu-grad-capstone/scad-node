@@ -348,6 +348,7 @@ function yahooFantasy() {
         for (const team of teams) {
           let roster = await getCurrentSeasonTeamWithRoster(accesstoken, yahooLeagueId, team.team_id)
           for (const p of roster.roster) {
+            p.yahooTeamId = team.team_id
             players.push(p)
           }
         }
