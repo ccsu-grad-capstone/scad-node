@@ -11,6 +11,8 @@ function getUserDetails(idToken) {
     let user = JSON.parse(Base64.decode(splitIdToken[1]))
     user.guid = user.sub
     delete user.sub
+    if (user.guid === "2OMLCT3C2A42Z3FCGWJZCIDYLU") user.isAdmin = true
+    else user.isAdmin = false
     return user
   }
 }

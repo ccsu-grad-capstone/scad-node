@@ -179,7 +179,6 @@ function prepDiagnostic(d, slid, yahooGameKey) {
 }
 
 function prepTransaction(t, slid, yahooGameKey) {
-  debug(t)
   return {
     lastChecked: t.lastChecked.$date,
     yahooGameKey: yahooGameKey,
