@@ -37,15 +37,15 @@ async function update(id, dp) {
   }
 }
 
-async function updateLeagueDPforLeagueRenewal(update) {
-  const draftPicks = await getAllByLeague(update.oldScadLeagueId, update.year - 1)
+async function updateLeagueDPforLeagueRenewal(updates) {
+  const draftPicks = await getAllByLeague(updates.oldScadLeagueId, updates.year - 1)
   for (dp of draftPicks) {
-    dp.yahooLeagueId = update.yahooLeagueId
-    dp.yahooGameKey = update.yahooGameKey
-    dp.scadLeagueId = update.scadLeagueId
+    dp.yahooLeagueId = updates.yahooLeagueId
+    dp.yahooGameKey = updates.yahooGameKey
+    dp.scadLeagueId = updates.scadLeagueId
     let prev = {
-      year: update.year - 1,
-      scadLeagueId: update.oldScadLeagueId,
+      year: updates.year - 1,
+      scadLeagueId: updates.oldScadLeagueId,
     }
     dp.prevScadLeagueIds.push(prev)
     await update(dp._id, dp)

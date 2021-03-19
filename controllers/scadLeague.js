@@ -196,7 +196,7 @@ async function renewLeague(id, renewedLeagueId, accesstoken) {
     await update(sl._id, sl)
 
     const prevScadTeams = await scadTeamController.getAllByScadLeagueId(sl._id)
-    const udls = await userDefaultLeagueController.getByYahooLeagueId(newScadLeague.yahooLeagueId)
+    const udls = await userDefaultLeagueController.getByYahooLeagueId(sl.yahooLeagueId)
     const scadPlayers = await scadPlayerController.getAllByScadLeagueId(sl._id)
 
     debug('Renew each SCAD team')
@@ -257,15 +257,15 @@ async function renewLeague(id, renewedLeagueId, accesstoken) {
     diagnostic.yahooGameKey = diagnostic.yahooGameKey
     await diagnosticController.update(diagnostic._id, diagnostic)
 
-    let update = {
+    let updates = {
       oldScadLeagueId: newScadLeague.previousScadLeagueId,
       year: newScadLeague.seasonYear,
       yahooLeagueId: newScadLeague.yahooLeagueId,
       yahooGameKey: newScadLeague.yahooGameKey,
       scadLeagueId: newScadLeague._id,
     }
-    await draftPicksController.updateLeagueDPforLeagueRenewal(update)
-    await capExemptionController.updateLeagueCEforLeagueRenewal(update)
+    await draftPicksController.updateLeagueDPforLeagueRenewal(updates)
+    await capExemptionController.updateLeagueCEforLeagueRenewal(updates)
 
     debug('Finished renewing SCAD league')
   } catch (error) {
