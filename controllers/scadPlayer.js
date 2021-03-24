@@ -83,18 +83,9 @@ async function create(scadPlayer) {
 
 async function update(id, scadPlayer) {
   debug('Updating ScadPlayer: ', id)
-  
-  const player = await getById(id)
 
-  if (player) {
-    Object.assign(player, scadPlayer)
-    player.updated = moment().format()
-    await player.save()
-    debug('Done Updating Player')
-    return player
-  } else {
-    throw ('Player not found.')
-  }
+  scadPlayer.updated = moment().format()
+  return await ScadPlayer.findByIdAndUpdate(id, scadPlayer, { new: true, runValidators: true }).exec()
 }
 
 async function remove(id) {
