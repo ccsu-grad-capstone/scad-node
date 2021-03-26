@@ -23,6 +23,7 @@ function yahooController(service) {
       res.redirect(`${VUE_APP_UI}/dashboard?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}&id_token=${tokens.id_token}`)
     } catch (err) {
       debug(err.stack)
+      res.status(500).send('Failed to get Access Tokens.')
     }
   }
 
@@ -36,6 +37,7 @@ function yahooController(service) {
       res.send(tokens)
     } catch (err) {
       debug(err.stack)
+      res.status(500).send('Failed to Refresh Token.')
     }
   }
 
