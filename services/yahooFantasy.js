@@ -214,7 +214,7 @@ function yahooFantasy() {
 
       let result = await yf.league.transactions(`${gameKey}.l.${yahooLeagueId}`)
       result.transactions = result.transactions.slice(0, 50)
-      return result
+      return result.transactions
     } catch (error) {
       debug('ERR getLeagueTransactions', error)
       throw `Error connecting to Yahoo Fantasy`
