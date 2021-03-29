@@ -63,7 +63,6 @@ async function create(req, res) {
 async function update(req, res) {
   const { id } = req.params
   const player = req.body.data
-  debug('update')
   if (player) {
     try {
       await scadPlayer.update(id, player)

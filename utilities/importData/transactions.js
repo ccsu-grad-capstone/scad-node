@@ -3,6 +3,7 @@ const importTransactions = {
   yahooLeagueId: '13088',
   lastTimestamp: '1609079466',
   yahooGameKey: '399',
+  endOfSeasonPlayerHistory: ['2019']
 }
 
 module.exports = { importTransactions }

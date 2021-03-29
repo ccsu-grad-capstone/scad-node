@@ -185,6 +185,7 @@ function prepTransaction(t, slid, yahooGameKey) {
     yahooLeagueId: t.yahooLeagueId,
     lastTimestamp: t.lastTimestamp,
     scadLeagueId: slid,
+    endOfSeasonPlayerHistory: t.endOfSeasonPlayerHistory
   }
 }
 

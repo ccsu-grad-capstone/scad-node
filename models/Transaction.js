@@ -6,7 +6,8 @@ const TransactionSchema = new Schema({
   yahooGameKey: { type: String, required: true },
   yahooLeagueId: { type: String, required: true },
   lastTimestamp: { type: String },
-  lastTransactionId: { type: String }
+  lastTransactionId: { type: String },
+  endOfSeasonPlayerHistory: { type: Array, default: ['2019'] }
 });
 
 const Transaction = mongoose.model("Transaction", TransactionSchema);
