@@ -119,12 +119,12 @@ function yahooFantasy() {
 
   async function getCurrentSeasonLeagueDetails(accesstoken, details, yahooLeagueId) {
     debug('getCurrentSeasonLeagueDetails')
+    let cs = await getCurrentYahooGame(accesstoken)
     try {
-      let cs = await getCurrentYahooGame(accesstoken)
       return await getLeagueDetails(accesstoken, details, yahooLeagueId, cs.game_key)
     } catch (error) {
       debug('ERR getCurrentSeasonLeagueDetails', error)
-      throw `Error connecting to Yahoo Fantasy`
+      return await getPreviousSeasonLeagueDetails(accesstoken, details, yahooLeagueId, cs.season)
     }
   }
 

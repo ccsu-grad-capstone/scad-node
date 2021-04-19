@@ -14,7 +14,7 @@ yahooRouter.get('/league/:yahooLeagueId/standings', scadAuth(), getLeagueStandin
 yahooRouter.get('/league/:yahooLeagueId/teams', scadAuth(), getLeagueTeams)
 yahooRouter.get('/league/get/all', scadAuth(), getAllUsersLeagues)
 yahooRouter.get('/league/:yahooLeagueId/transactions', scadAuth(), getLeagueTransactions)
-yahooRouter.get('/league/:yahooLeagueId/team/:yahooTeamId/roster', scadAuth(), getTeamWithRoster)
+yahooRouter.get('/game/:yahooGameKey/league/:yahooLeagueId/team/:yahooTeamId/roster', scadAuth(), getTeamWithRoster)
 
 // Need to add to LAMBDAS
 yahooRouter.get('/game', scadAuth(), getGames)
@@ -133,10 +133,10 @@ async function getLeagueTransactions(req, res) {
 }
 
 async function getTeamWithRoster(req, res) {
-  const { yahooLeagueId, yahooTeamId } = req.params
+  const { yahooLeagueId, yahooTeamId, yahooGameKey } = req.params
   const { accesstoken } = req.headers
   try {
-    let result = await yf.getCurrentSeasonTeamWithRoster(accesstoken, yahooLeagueId, yahooTeamId)
+    let result = await yf.getTeamWithRoster(accesstoken, yahooLeagueId, yahooTeamId, yahooGameKey)
     res.json({
       team: result,
     })
