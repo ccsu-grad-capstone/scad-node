@@ -10,7 +10,7 @@ const scadLeagueRouter = express.Router()
 
 // ----- Returning Scad Leagues -----
 scadLeagueRouter.get('/:id', scadAuth(), getById)
-scadLeagueRouter.get('/yahoo/:gameKey/:yahooLeagueId', scadAuth(), getByYahooLeagueId)
+scadLeagueRouter.get('/yahoo/:yahooGameKey/:yahooLeagueId', scadAuth(), getByYahooLeagueId)
 scadLeagueRouter.put('/:id', scadAuth(), update)
 scadLeagueRouter.post('/', scadAuth(), create)
 scadLeagueRouter.post('/import', scadAuth(), importLeague)
@@ -23,23 +23,23 @@ scadLeagueRouter.put('/default/update/:id', scadAuth(), updateDefaultLeague)
 
 // ----- Returning Scad Teams -----
 scadLeagueRouter.get('/:id/team/all', scadAuth(), getAllTeamsByScadLeagueId)
-scadLeagueRouter.get('/yahoo/:gameKey/:yahooLeagueId/team/all', scadAuth(), getAllTeamsByYahooLeagueId)
-scadLeagueRouter.get('/:id/team/myTeam', scadAuth(), getMyTeamByScadLeagueId)
-scadLeagueRouter.get('/yahoo/:gameKey/:yahooLeagueId/team/myTeam', scadAuth(), getMyTeamByYahooLeagueId)
+scadLeagueRouter.get('/yahoo/:yahooGameKey/:yahooLeagueId/team/all', scadAuth(), getAllTeamsByYahooLeagueId)
+scadLeagueRouter.get('/:id/game/:yahooGameKey/team/myTeam', scadAuth(), getMyTeamByScadLeagueId)
+scadLeagueRouter.get('/yahoo/:yahooGameKey/:yahooLeagueId/team/myTeam', scadAuth(), getMyTeamByYahooLeagueId)
 scadLeagueRouter.get('/:id/yahooTeam/:yahooTeamId', scadAuth(), getTeamByScadLeagueIdYahooTeamId)
 
 // ----- Returning Scad Players -----
 scadLeagueRouter.get('/:id/player/all', scadAuth(), getAllPlayersByScadLeagueId)
-scadLeagueRouter.get('/yahoo/:gameKey/:yahooLeagueId/player/all', scadAuth(), getAllPlayersByYahooLeagueId)
+scadLeagueRouter.get('/yahoo/:yahooGameKey/:yahooLeagueId/player/all', scadAuth(), getAllPlayersByYahooLeagueId)
 
 scadLeagueRouter.get(
-  '/yahoo/:gameKey/:yahooLeagueId/team/:yahooTeamId/players',
+  '/yahoo/:yahooGameKey/:yahooLeagueId/team/:yahooTeamId/players',
   scadAuth(),
   getAllTeamPlayersByYahooIds
 )
 
 scadLeagueRouter.get('/:id/players/myPlayers', scadAuth(), getMyPlayersByScadId) //
-scadLeagueRouter.get('/yahoo/:gameKey/:yahooLeagueId/player/myPlayers', scadAuth(), getMyPlayersByYahooId) //
+scadLeagueRouter.get('/yahoo/:yahooGameKey/:yahooLeagueId/player/myPlayers', scadAuth(), getMyPlayersByYahooId) //
 
 module.exports = scadLeagueRouter
 
@@ -59,10 +59,10 @@ async function getById(req, res) {
 }
 
 async function getByYahooLeagueId(req, res) {
-  const { gameKey, yahooLeagueId } = req.params
-  debug('getByYahooLeagueId', gameKey, yahooLeagueId)
+  const { yahooGameKey, yahooLeagueId } = req.params
+  debug('getByYahooLeagueId', yahooGameKey, yahooLeagueId)
   try {
-    const result = await scadLeague.getByYahooLeagueId(gameKey, yahooLeagueId)
+    const result = await scadLeague.getByYahooLeagueId(yahooGameKey, yahooLeagueId)
     if (result) {
       res.json({
         scadLeague: result,
@@ -212,10 +212,10 @@ async function getAllTeamsByScadLeagueId(req, res) {
 }
 
 async function getAllTeamsByYahooLeagueId(req, res) {
-  const { gameKey, yahooLeagueId } = req.params
-  debug('getAllTeamsByYahooLeagueId', gameKey, yahooLeagueId)
+  const { yahooGameKey, yahooLeagueId } = req.params
+  debug('getAllTeamsByYahooLeagueId', yahooGameKey, yahooLeagueId)
   try {
-    const result = await scadTeam.getAllByYahooLeagueId(gameKey, yahooLeagueId)
+    const result = await scadTeam.getAllByYahooLeagueId(yahooGameKey, yahooLeagueId)
     res.json({
       scadTeams: result,
     })
@@ -226,11 +226,11 @@ async function getAllTeamsByYahooLeagueId(req, res) {
 }
 
 async function getMyTeamByScadLeagueId(req, res) {
-  const { id } = req.params
+  const { id, yahooGameKey } = req.params
   const { accesstoken } = req.headers
   debug('getMyTeamByScadLeagueId', id)
   try {
-    const result = await scadTeam.getMyTeamByScadLeagueId(id, accesstoken)
+    const result = await scadTeam.getMyTeamByScadLeagueId(id, accesstoken, yahooGameKey)
     res.json({
       myTeam: result,
     })
@@ -255,11 +255,11 @@ async function getTeamByScadLeagueIdYahooTeamId(req, res) {
 }
 
 async function getMyTeamByYahooLeagueId(req, res) {
-  const { gameKey, yahooLeagueId } = req.params
+  const { yahooGameKey, yahooLeagueId } = req.params
   const { accesstoken } = req.headers
-  debug('getMyTeamByYahooLeagueId', gameKey, yahooLeagueId)
+  debug('getMyTeamByYahooLeagueId', yahooGameKey, yahooLeagueId)
   try {
-    const result = await scadTeam.getMyTeamByYahooLeagueId(gameKey, yahooLeagueId, accesstoken)
+    const result = await scadTeam.getMyTeamByYahooLeagueId(yahooGameKey, yahooLeagueId, accesstoken)
     res.json({
       myTeam: result,
     })
@@ -285,10 +285,10 @@ async function getAllPlayersByScadLeagueId(req, res) {
 }
 
 async function getAllPlayersByYahooLeagueId(req, res) {
-  const { gameKey, yahooLeagueId } = req.params
-  debug('getAllPlayersByYahooLeagueId', gameKey, yahooLeagueId)
+  const { yahooGameKey, yahooLeagueId } = req.params
+  debug('getAllPlayersByYahooLeagueId', yahooGameKey, yahooLeagueId)
   try {
-    const result = await scadPlayer.getAllByYahooLeagueId(gameKey, yahooLeagueId)
+    const result = await scadPlayer.getAllByYahooLeagueId(yahooGameKey, yahooLeagueId)
     res.json({
       scadPlayers: result,
     })
@@ -299,11 +299,11 @@ async function getAllPlayersByYahooLeagueId(req, res) {
 }
 
 async function getAllTeamPlayersByYahooIds(req, res) {
-  const { gameKey, yahooLeagueId, yahooTeamId } = req.params
+  const { yahooGameKey, yahooLeagueId, yahooTeamId } = req.params
   const { accesstoken } = req.headers
-  debug('getAllTeamPlayersByYahooIds', gameKey, yahooLeagueId, yahooTeamId)
+  debug('getAllTeamPlayersByYahooIds', yahooGameKey, yahooLeagueId, yahooTeamId)
   try {
-    const result = await scadPlayer.getAllForTeamByYahooIds(gameKey, yahooLeagueId, yahooTeamId, accesstoken)
+    const result = await scadPlayer.getAllForTeamByYahooIds(yahooGameKey, yahooLeagueId, yahooTeamId, accesstoken)
     res.json({
       scadPlayers: result,
     })
@@ -329,11 +329,11 @@ async function getMyPlayersByScadId(req, res) {
 }
 
 async function getMyPlayersByYahooId(req, res) {
-  const { gameKey, yahooLeagueId } = req.params
+  const { yahooGameKey, yahooLeagueId } = req.params
   const { accesstoken } = req.headers
-  debug('getMyPlayersByScadId', gameKey, yahooLeagueId)
+  debug('getMyPlayersByScadId', yahooGameKey, yahooLeagueId)
   try {
-    const result = await scadPlayer.getMyPlayersByYahooId(gameKey, yahooLeagueId, accesstoken)
+    const result = await scadPlayer.getMyPlayersByYahooId(yahooGameKey, yahooLeagueId, accesstoken)
     res.json({
       scadPlayers: result,
     })

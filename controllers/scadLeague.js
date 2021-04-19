@@ -15,9 +15,9 @@ async function getById(id) {
   return await ScadLeague.findById(id)
 }
 
-async function getByYahooLeagueId(gameKey, yahooLeagueId) {
-  debug('Getting ScadLeague by yahooLeagueId:', gameKey, yahooLeagueId)
-  return await ScadLeague.findOne({ yahooGameKey: gameKey, yahooLeagueId: yahooLeagueId })
+async function getByYahooLeagueId(yahooGameKey, yahooLeagueId) {
+  debug('Getting ScadLeague by yahooLeagueId:', yahooGameKey, yahooLeagueId)
+  return await ScadLeague.findOne({ yahooGameKey: yahooGameKey, yahooLeagueId: yahooLeagueId })
 }
 
 async function create(scadLeague, accesstoken) {
@@ -39,7 +39,7 @@ async function create(scadLeague, accesstoken) {
     await newScadLeague.save()
 
     const yahooTeams = await yf.getCurrentSeasonLeagueDetails(accesstoken, 'teams', scadLeague.yahooLeagueId)
-    const yahooLeaguePlayers = await yf.getAllLeaguePlayers(accesstoken, scadLeague.yahooLeagueId)
+    const yahooLeaguePlayers = await yf.getAllLeaguePlayers(accesstoken, scadLeague.yahooLeagueId, currentYahooGame.game_key)
 
     for (const yt of yahooTeams) {
       // For each Yahoo Team, create a SCAD team..
