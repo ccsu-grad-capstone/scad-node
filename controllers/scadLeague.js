@@ -45,6 +45,7 @@ async function create(scadLeague, accesstoken) {
       // For each Yahoo Team, create a SCAD team..
       let st = {
         yahooTeamId: yt.team_id,
+        yahooGuid: yt.managers[0].guid,
         yahooLeagueId: scadLeague.yahooLeagueId,
         scadLeagueId: newScadLeague._id,
         salary: 0,
@@ -198,15 +199,20 @@ async function renewLeague(id, renewedLeagueId, accesstoken) {
     const prevScadTeams = await scadTeamController.getAllByScadLeagueId(sl._id)
     const udls = await userDefaultLeagueController.getByYahooLeagueId(sl.yahooLeagueId)
     const scadPlayers = await scadPlayerController.getAllByScadLeagueId(sl._id)
+    const prevYahooTeams = await yf.getLeagueStandings(accesstoken, sl.yahooGameKey, sl.yahooLeagueId)
+    const newYahooTeams = await yf.getLeagueStandings(accesstoken, newScadLeague.yahooGameKey, newScadLeague.yahooLeagueId)
 
     debug('Renew each SCAD team')
     for (const st of prevScadTeams) {
+      pyt = prevYahooTeams.find(yt => yt.team_id == st.yahooTeamId)
+      nyt = newYahooTeams.find(yt => yt.managers[0].guid == pyt.managers[0].guid)
       // Renew each scad team
       let nst = {
-        yahooTeamId: st.yahooTeamId,
+        yahooTeamId: nyt.team_id,
+        yahooGuid: nyt.managers[0].guid,
         yahooLeagueId: newScadLeague.yahooLeagueId,
         scadLeagueId: newScadLeague._id,
-        salary: 0,
+        salary: st.salary,
         isFranchiseTag: false,
         exceptionIn: 0,
         exceptionOut: 0,
@@ -238,7 +244,8 @@ async function renewLeague(id, renewedLeagueId, accesstoken) {
         salary: sp.salary,
         isFranchiseTag: false,
         previousYearSalary: sp.salary,
-        previousScadPlayerId: sp._id,
+        history: sp.history,
+        previousScadPlayerId: sp._id
       }
       nsp = await scadPlayerController.create(nsp)
 
@@ -246,15 +253,17 @@ async function renewLeague(id, renewedLeagueId, accesstoken) {
       await scadPlayerController.update(sp._id, sp)
     }
     debug('Finished renewing SCAD players')
-
-    let transaction = await transactionController.get(sl.yahooLeagueId)
+    
+    let transactions = await transactionController.get(sl.yahooGameKey, sl.yahooLeagueId)
+    let transaction = transactions[0]
     transaction.yahooLeagueId = newScadLeague.yahooLeagueId
     transaction.yahooGameKey = newScadLeague.yahooGameKey
     await transactionController.update(transaction._id, transaction)
-
-    let diagnostic = await diagnosticController.get(sl.yahooLeagueId)
-    diagnostic.yahooLeagueId = diagnostic.yahooLeagueId
-    diagnostic.yahooGameKey = diagnostic.yahooGameKey
+    
+    let diagnostics = await diagnosticController.get(sl.yahooGameKey, sl.yahooLeagueId)
+    let diagnostic = diagnostics[0]
+    diagnostic.yahooLeagueId = newScadLeague.yahooLeagueId
+    diagnostic.yahooGameKey = newScadLeague.yahooGameKey
     await diagnosticController.update(diagnostic._id, diagnostic)
 
     let updates = {

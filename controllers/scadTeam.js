@@ -41,8 +41,6 @@ async function getMyTeamByScadLeagueId(id, accesstoken, yahooGameKey) {
   } else {
     myYahooTeams = await yf.getMyTeams(accesstoken, yahooGameKey)
   }
-  debug(yahooGameKey)
-  debug(myYahooTeams)
   let yahooTeam = myYahooTeams.find((yt) => yt.team_key.includes(scadLeagueTeams[0].yahooLeagueId))
   return scadLeagueTeams.find((st) => st.yahooTeamId === yahooTeam.team_id)
 }

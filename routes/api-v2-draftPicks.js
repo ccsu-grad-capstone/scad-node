@@ -7,7 +7,7 @@ const draftPicksRouter = express.Router()
 
 draftPicksRouter.get('/check/:scadLeagueId', scadAuth(), checkLeague)
 draftPicksRouter.get('/:scadLeagueId', scadAuth(), getAllByLeague)
-draftPicksRouter.get('/:scadLeagueId/:yahooTeamId', scadAuth(), getAllByTeam)
+draftPicksRouter.get('/:scadLeagueId/:guid', scadAuth(), getAllByTeam)
 draftPicksRouter.post('/create', scadAuth(), create)
 // draftPicksRouter.put('/updateLeague', scadAuth(), updateLeague)
 draftPicksRouter.put('/:id', scadAuth(), update)
@@ -46,12 +46,16 @@ async function getAllByLeague(req, res) {
 }
 
 async function getAllByTeam(req, res) {
-  const { scadLeagueId, yahooTeamId } = req.params
-  debug(scadLeagueId, yahooTeamId)
+  const { scadLeagueId, guid } = req.params
+  debug(scadLeagueId, guid)
   try {
     const result = await draftPicks.getAllByLeague(scadLeagueId, 180)
-    let teamPicks = result.filter((t) => t.team.team_id == yahooTeamId)
-
+    let teamPicks = []
+    for (const dp of result) {
+      if (dp.team.managers[0].manager) {
+        if (dp.team.managers[0].manager.guid == guid) teamPicks.push(dp)
+      } else if (dp.team.managers[0].guid == guid) teamPicks.push(dp) 
+    }
     res.json({
       data: teamPicks,
     })

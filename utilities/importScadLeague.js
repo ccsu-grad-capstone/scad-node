@@ -65,7 +65,7 @@ async function importScadLeague(accesstoken) {
   debug('Transactions Created')
   
   let yahooTeams = await yf.getLeagueDetails(accesstoken, 'teams', sl.yahooLeagueId, sl.yahooGameKey)
-  let yahooGame = await yf.getCurrentYahooGame(accesstoken)
+  let yahooGame = await yf.getPreviousYahooGame(accesstoken, 2021)
   
   for (const yt of yahooTeams) {
     for (const manager of yt.managers) {

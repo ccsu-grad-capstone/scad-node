@@ -8,7 +8,7 @@ const capExemptionRouter = express.Router()
 
 capExemptionRouter.get('/check/:scadLeagueId', scadAuth(), checkLeague)
 capExemptionRouter.get('/:scadLeagueId', scadAuth(), getAllByLeague)
-capExemptionRouter.get('/:scadLeagueId/:yahooTeamId', scadAuth(), getAllByTeam)
+capExemptionRouter.get('/:scadLeagueId/:guid', scadAuth(), getAllByTeam)
 capExemptionRouter.post('/create', scadAuth(), create)
 // capExemptionRouter.put('/updateLeague', scadAuth(), updateLeague)
 capExemptionRouter.put('/:id', scadAuth(), update)
@@ -48,10 +48,19 @@ async function getAllByLeague(req, res) {
 
 async function getAllByTeam(req, res) {
   debug('getAllByTeam')
-  const { scadLeagueId, yahooTeamId } = req.params
+  const { scadLeagueId, guid } = req.params
   try {
     const result = await capExemptions.getAllByLeague(scadLeagueId)
-    let teamCE = result.filter((t) => t.yahooTeamGive.team_id == yahooTeamId || t.yahooTeamRecieve.team_id == yahooTeamId)
+    let teamCE = []
+    for (const ce of result) {
+      if (ce.yahooTeamGive.managers[0].guid && ce.yahooTeamGive.managers[0].guid == guid) teamCE.push(ce) 
+      else if (ce.yahooTeamRecieve.managers[0].guid && ce.yahooTeamRecieve.managers[0].guid == guid) teamCE.push(ce)
+      else if (ce.yahooTeamGive.managers[0].manager) {
+        if (ce.yahooTeamGive.managers[0].manager.guid == guid) teamCE.push(ce)
+      } else if (ce.yahooTeamRecieve.managers[0].manager) {
+        if (ce.yahooTeamRecieve.managers[0].manager.guid == guid) teamCE.push(ce)
+      }
+    }
     res.json({
       data: teamCE,
     })

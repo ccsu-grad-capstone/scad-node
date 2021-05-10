@@ -10,6 +10,7 @@ scadPlayerRouter.get('/yahoo/:yahooGameKey/:yahooLeagueId/player/:yahooPlayerId'
 scadPlayerRouter.put('/:id', scadAuth(), update)
 scadPlayerRouter.post('/', scadAuth(), create)
 scadPlayerRouter.delete('/:id', scadAuth(), remove)
+scadPlayerRouter.post('/importUpdates', importUpdates)
 
 module.exports = scadPlayerRouter
 
@@ -87,3 +88,16 @@ async function remove(req, res) {
     res.status(500).send('An Error Occured Removing Scad Player')
   }
 }
+
+async function importUpdates(req, res) {
+  // const { id } = req.params
+  debug('importUpdates')
+  try {
+    // await scadPlayer.importUpdates()
+    res.send('Imported Player Salary Updates Successfully')
+  } catch (error) {
+    debug(error)
+    res.status(500).send('An Error Occured Importing Player Salary Updates')
+  }
+}
+
