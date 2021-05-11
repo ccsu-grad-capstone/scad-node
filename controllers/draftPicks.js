@@ -10,10 +10,12 @@ async function checkLeague(scadLeagueId) {
   }
 }
 
-async function getAllByLeague(scadLeagueId, limit) {
+async function getAllByLeague(scadLeagueId, year, limit) {
   debug('Getting all draft picks by league: ')
   try {
-    return await DraftPick.find({ scadLeagueId: scadLeagueId }).sort({ year: 1 }).limit(limit)
+    return await DraftPick.find({ scadLeagueId: scadLeagueId, year: { $gte: parseInt(year) } })
+      .sort({ year: 1 })
+      .limit(limit)
   } catch (error) {
     throw error
   }

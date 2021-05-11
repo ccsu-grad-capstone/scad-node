@@ -7,8 +7,8 @@ const scadAuth = require('../utilities/scadAuth')
 const capExemptionRouter = express.Router()
 
 capExemptionRouter.get('/check/:scadLeagueId', scadAuth(), checkLeague)
-capExemptionRouter.get('/:scadLeagueId', scadAuth(), getAllByLeague)
-capExemptionRouter.get('/:scadLeagueId/:guid', scadAuth(), getAllByTeam)
+capExemptionRouter.get('/:scadLeagueId/:year', scadAuth(), getAllByLeague)
+capExemptionRouter.get('/:scadLeagueId/:year/:guid', scadAuth(), getAllByTeam)
 capExemptionRouter.post('/create', scadAuth(), create)
 // capExemptionRouter.put('/updateLeague', scadAuth(), updateLeague)
 capExemptionRouter.put('/:id', scadAuth(), update)
@@ -34,9 +34,9 @@ async function checkLeague(req, res) {
 
 async function getAllByLeague(req, res) {
   debug('getAllByLeague')
-  const { scadLeagueId } = req.params
+  const { scadLeagueId, year } = req.params
   try {
-    const result = await capExemptions.getAllByLeague(scadLeagueId)
+    const result = await capExemptions.getAllByLeague(scadLeagueId, year)
     res.json({
       data: result,
     })
@@ -48,9 +48,9 @@ async function getAllByLeague(req, res) {
 
 async function getAllByTeam(req, res) {
   debug('getAllByTeam')
-  const { scadLeagueId, guid } = req.params
+  const { scadLeagueId, year, guid } = req.params
   try {
-    const result = await capExemptions.getAllByLeague(scadLeagueId)
+    const result = await capExemptions.getAllByLeague(scadLeagueId, year)
     let teamCE = []
     for (const ce of result) {
       if (ce.yahooTeamGive.managers[0].guid && ce.yahooTeamGive.managers[0].guid == guid) teamCE.push(ce) 

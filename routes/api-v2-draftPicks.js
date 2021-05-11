@@ -6,8 +6,8 @@ const scadAuth = require('../utilities/scadAuth')
 const draftPicksRouter = express.Router()
 
 draftPicksRouter.get('/check/:scadLeagueId', scadAuth(), checkLeague)
-draftPicksRouter.get('/:scadLeagueId', scadAuth(), getAllByLeague)
-draftPicksRouter.get('/:scadLeagueId/:guid', scadAuth(), getAllByTeam)
+draftPicksRouter.get('/:scadLeagueId/:year', scadAuth(), getAllByLeague)
+draftPicksRouter.get('/:scadLeagueId/:year/:guid', scadAuth(), getAllByTeam)
 draftPicksRouter.post('/create', scadAuth(), create)
 // draftPicksRouter.put('/updateLeague', scadAuth(), updateLeague)
 draftPicksRouter.put('/:id', scadAuth(), update)
@@ -32,10 +32,10 @@ async function checkLeague(req, res) {
 }
 
 async function getAllByLeague(req, res) {
-  const { scadLeagueId } = req.params
+  const { scadLeagueId, year } = req.params
   debug(scadLeagueId)
   try {
-    const result = await draftPicks.getAllByLeague(scadLeagueId, 180)
+    const result = await draftPicks.getAllByLeague(scadLeagueId, year, 180)
     res.json({
       data: result,
     })
@@ -46,10 +46,10 @@ async function getAllByLeague(req, res) {
 }
 
 async function getAllByTeam(req, res) {
-  const { scadLeagueId, guid } = req.params
-  debug(scadLeagueId, guid)
+  const { scadLeagueId, year, guid } = req.params
+  debug(scadLeagueId, year, guid)
   try {
-    const result = await draftPicks.getAllByLeague(scadLeagueId, 180)
+    const result = await draftPicks.getAllByLeague(scadLeagueId, year, 180)
     let teamPicks = []
     for (const dp of result) {
       if (dp.team.managers[0].manager) {

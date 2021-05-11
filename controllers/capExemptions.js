@@ -10,10 +10,10 @@ async function checkLeague(scadLeagueId) {
   }
 }
 
-async function getAllByLeague(scadLeagueId) {
+async function getAllByLeague(scadLeagueId, year) {
   debug('Getting all CapExemptions by league: ')
   try {
-    return await CapExemption.find({ scadLeagueId: scadLeagueId }).sort({ year: 1 })
+    return await CapExemption.find({ scadLeagueId: scadLeagueId, year: { $gte: parseInt(year) } }).sort({ year: 1 })
   } catch (error) {
     throw error
   }
