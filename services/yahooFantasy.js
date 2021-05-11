@@ -109,8 +109,20 @@ function yahooFantasy() {
       var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
       yf.setUserToken(accesstoken)
 
-      let result = await yf.roster.players(`${yahooGameKey}.l.${yahooLeagueId}.t.${yahooTeamId}`)
-      return result
+      let teamWithRoster = await yf.roster.players(`${yahooGameKey}.l.${yahooLeagueId}.t.${yahooTeamId}`)
+      if (teamWithRoster.roster.length > 0) {
+        return teamWithRoster
+      } else {
+        let currentSeasonWithTeams = await yf.league.standings(`${yahooGameKey}.l.${yahooLeagueId}`)
+        // debug(currentSeasonWithTeams)
+        let previousSeasonWithTeams = await yf.league.standings(`${currentSeasonWithTeams.renew.split('_')[0]}.l.${currentSeasonWithTeams.renew.split('_')[1]}`)
+        // debug(previousSeasonWithTeams)
+        let currentSeasonTeam = currentSeasonWithTeams.standings.find(t => t.team_id == yahooTeamId)
+        let previousSeasonTeam = previousSeasonWithTeams.standings.find(t => t.managers[0].guid === currentSeasonTeam.managers[0].guid)
+        let prevTeamWithRoster = await yf.roster.players(`${previousSeasonWithTeams.league_key}.t.${previousSeasonTeam.team_id}`)
+        // debug(prevTeamWithRoster)
+        return prevTeamWithRoster
+      }
     } catch (error) {
       debug('ERR getTeamWithRoster', error)
       throw `Error connecting to Yahoo Fantasy`
@@ -224,10 +236,14 @@ function yahooFantasy() {
   async function getCurrentYahooGame(accesstoken) {
     debug('getCurrentYahooGame')
     try {
+      debug('*')
       var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
+      debug('**')
       yf.setUserToken(accesstoken)
-
+      debug('***')
+      
       let result = await yf.game.meta('nfl')
+      debug('****')
 
       return result
     } catch (error) {

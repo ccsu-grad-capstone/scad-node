@@ -32,7 +32,8 @@ async function getMyPlayersByScadId(scadLeagueId, accesstoken) {
 
   let scadLeague = await ScadLeague.findById(scadLeagueId)
   let myt = await yf.getMyTeam(accesstoken, scadLeague.yahooLeagueId, scadLeague.yahooGameKey)
-  return await getScadPlayersFromYahooTeam(myt, scadLeague.yahooLeagueId)
+  // debug(myt)
+  return await getScadPlayersFromYahooTeam(myt, scadLeague.yahooLeagueId, scadLeague.yahooGameKey)
 }
 
 async function getMyPlayersByYahooId(yahooGameKey, yahooLeagueId, accesstoken) {
@@ -56,13 +57,15 @@ async function getAllForTeamByYahooIds(yahooGameKey, yahooLeagueId, yahooTeamId,
 
   const yt = await yf.getTeamWithRoster(accesstoken, yahooLeagueId, yahooTeamId, yahooGameKey)
 
-  return await getScadPlayersFromYahooTeam(yt, yahooLeagueId)
+  return await getScadPlayersFromYahooTeam(yt, yahooLeagueId, yahooGameKey)
 }
 
-async function getScadPlayersFromYahooTeam(yahooTeam, yahooLeagueId) {
+async function getScadPlayersFromYahooTeam(yahooTeam, yahooLeagueId, currentSeasonGameKey) {
   debug('getScadPlayersFromYahooTeam')
   let scadPlayers = []
-  let yahooGameKey = yahooTeam.team_key.split('.')[0]
+  let yahooGameKey
+  if (currentSeasonGameKey) yahooGameKey = currentSeasonGameKey
+  else yahooGameKey = yahooTeam.team_key.split('.')[0]
   for (const yp of yahooTeam.roster) {
     scadPlayers.push(await getByYahooIds(yahooGameKey, yahooLeagueId, yp.player_id))
   }
