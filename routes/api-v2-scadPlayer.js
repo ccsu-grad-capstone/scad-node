@@ -1,4 +1,9 @@
 const express = require('express')
+const multer = require('multer')
+const storage = multer.memoryStorage()
+const memoryStorage = multer({ storage: storage })
+const csv = require('csvtojson')
+
 const scadPlayer = require('../controllers/scadPlayer')
 const debug = require('debug')('app:scadPlayerRouter')
 const scadAuth = require('../utilities/scadAuth')
@@ -10,7 +15,7 @@ scadPlayerRouter.get('/yahoo/:yahooGameKey/:yahooLeagueId/player/:yahooPlayerId'
 scadPlayerRouter.put('/:id', scadAuth(), update)
 scadPlayerRouter.post('/', scadAuth(), create)
 scadPlayerRouter.delete('/:id', scadAuth(), remove)
-scadPlayerRouter.post('/importUpdates', importUpdates)
+scadPlayerRouter.post('/importUpdates', scadAuth(), memoryStorage.any(), importUpdates)
 
 module.exports = scadPlayerRouter
 
@@ -93,8 +98,19 @@ async function importUpdates(req, res) {
   // const { id } = req.params
   debug('importUpdates')
   try {
+    if (req.files && req.files.length > 0) {
+      // debug('Files', req.files[0].buffer.toString())
+      let list = await csv().fromString(req.files[0].buffer.toString())
+      if (list && list.length > 0){
+        await scadPlayer.updatePlayersSalaries(list)
+        debug('Finished Updating Salaries')
+      }
+      res.send('Imported Player Salary Updates Successfully')
+    } else {
+      debug('No Files')
+      res.send('No Files Uploaded')
+    }
     // await scadPlayer.importUpdates()
-    res.send('Imported Player Salary Updates Successfully')
   } catch (error) {
     debug(error)
     res.status(500).send('An Error Occured Importing Player Salary Updates')
