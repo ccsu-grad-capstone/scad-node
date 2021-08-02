@@ -55,11 +55,8 @@ async function getAllByTeam(req, res) {
     for (const ce of result) {
       if (ce.yahooTeamGive.managers[0].guid && ce.yahooTeamGive.managers[0].guid == guid) teamCE.push(ce) 
       else if (ce.yahooTeamRecieve.managers[0].guid && ce.yahooTeamRecieve.managers[0].guid == guid) teamCE.push(ce)
-      else if (ce.yahooTeamGive.managers[0].manager) {
-        if (ce.yahooTeamGive.managers[0].manager.guid == guid) teamCE.push(ce)
-      } else if (ce.yahooTeamRecieve.managers[0].manager) {
-        if (ce.yahooTeamRecieve.managers[0].manager.guid == guid) teamCE.push(ce)
-      }
+      else if (ce.yahooTeamGive.managers[0].manager && ce.yahooTeamGive.managers[0].manager.guid == guid) teamCE.push(ce)
+      else if (ce.yahooTeamRecieve.managers[0].manager && ce.yahooTeamRecieve.managers[0].manager.guid == guid) teamCE.push(ce)
     }
     res.json({
       data: teamCE,
