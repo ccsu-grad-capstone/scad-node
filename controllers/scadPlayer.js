@@ -98,44 +98,58 @@ async function remove(id) {
 
 async function updatePlayersSalaries(list) {
   debug('Updating Players Salaries')
+  let failedList = []
   if (list) {
     for (const p of list) {
       let player = await getById(p._id)
-      
-      // debug(p)
-      // debug(player)
 
-      player.salary = p.newSalary
-      player.previousYearSalary = p.prevSalary
-      let log
-
-      if (p.wasFranchiseTagged === 'true' || p.wasFranchiseTagged === 'TRUE') {
-        player.isFranchiseTag = false
-        log = {
-          originalSalary: p.prevSalary,
-          newSalary: 0,
-          type: 'Franchise Tag Reset',
-          team: player.history[player.history.length - 1].team,
-          user: undefined,
-          comment: 'Resetting salary, player was franchised previous year.',
-          date: moment().format(),
+      if (player) {
+        // debug(p)
+        // debug(player)
+  
+        player.salary = p.newSalary
+        player.previousYearSalary = p.prevSalary
+        let log
+  
+        if (p.wasFranchiseTagged === 'true' || p.wasFranchiseTagged === 'TRUE') {
+          player.isFranchiseTag = false
+          log = {
+            originalSalary: p.prevSalary,
+            newSalary: 0,
+            type: 'Franchise Tag Reset',
+            team: player.history[player.history.length - 1].team,
+            user: undefined,
+            comment: 'Resetting salary, player was franchised previous year.',
+            date: moment().format(),
+          }
+        } else {
+          log = {
+            originalSalary: p.prevSalary,
+            newSalary: p.newSalary,
+            type: 'Offseason Salary Correction',
+            team: player.history[player.history.length - 1].team,
+            user: undefined,
+            comment: 'Offseason Salary Adjustment',
+            date: moment().format(),
+          }
         }
+        player.history.push(log)
+        await update(player._id, player)
       } else {
-        log = {
-          originalSalary: p.prevSalary,
-          newSalary: p.newSalary,
-          type: 'Offseason Salary Correction',
-          team: player.history[player.history.length - 1].team,
-          user: undefined,
-          comment: 'Salary adjustment',
-          date: moment().format(),
-        }
-      }
-      player.history.push(log)
-      await update(player._id, player)
-      break
+        debug('Player:', p, 'was not updated.')
+        failedList.push(p)
+      }      
     }
   }
+  if (failedList.length === 0) {
+    debug('Imported Player Salary Updates Successfully')
+    return 'Imported Player Salary Updates Successfully'
+  } else if (failedList.length > 0) {
+    debug(`Successful, with ${failedList.length} players unable to update.`)
+    debug(failedList)
+    return `Successful, with ${failedList.length} players unable to update.`
+  }
+
 }
 
 module.exports = {

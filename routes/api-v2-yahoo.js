@@ -16,7 +16,6 @@ yahooRouter.get('/game/:yahooGameKey/league/get/all', scadAuth(), getAllUsersLea
 yahooRouter.get('/game/:yahooGameKey/league/:yahooLeagueId/transactions', scadAuth(), getLeagueTransactions)
 yahooRouter.get('/game/:yahooGameKey/league/:yahooLeagueId/team/:yahooTeamId/roster', scadAuth(), getTeamWithRoster)
 
-// Need to add to LAMBDAS
 yahooRouter.get('/game', scadAuth(), getGames)
 yahooRouter.get('/game/:yahooGameKey/league/commissioner/all', scadAuth(), getAllCommishLeagues)
 yahooRouter.get('/game/:yahooGameKey/league/:yahooLeagueId/players', scadAuth(), getAllLeaguePlayers)

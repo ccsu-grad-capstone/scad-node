@@ -7,6 +7,7 @@ const csv = require('csvtojson')
 const scadPlayer = require('../controllers/scadPlayer')
 const debug = require('debug')('app:scadPlayerRouter')
 const scadAuth = require('../utilities/scadAuth')
+const { result } = require('lodash')
 
 const scadPlayerRouter = express.Router()
 
@@ -101,11 +102,12 @@ async function importUpdates(req, res) {
     if (req.files && req.files.length > 0) {
       // debug('Files', req.files[0].buffer.toString())
       let list = await csv().fromString(req.files[0].buffer.toString())
+      let result
       if (list && list.length > 0){
-        await scadPlayer.updatePlayersSalaries(list)
+        result = await scadPlayer.updatePlayersSalaries(list)
         debug('Finished Updating Salaries')
       }
-      res.send('Imported Player Salary Updates Successfully')
+      res.send(result)
     } else {
       debug('No Files')
       res.send('No Files Uploaded')
