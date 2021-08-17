@@ -31,13 +31,11 @@ function yahooOauth() {
           if (response.status === 200) {
             resolve(response.data)
           } else {
-            debug('*')
             debug(response.status)
             reject(response.status)
           }
         })
         .catch(error => {
-          debug('**')
           debug(error)
           reject(error)
         })
