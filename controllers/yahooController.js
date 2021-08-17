@@ -12,18 +12,12 @@ function yahooController(service) {
   }
 
   async function getAccessTokens(req, res) {
-
     const { code } = req.query
     try {
       const tokens = await service.getAccessTokens(code)
-      // debug(`accesstoken: ${tokens.accesstoken}`)
-      // debug(`refresh_token: ${tokens.refresh_token}`)
-      // debug(`idtoken: ${tokens.idtoken}`)
-      // res.send(tokens)
       res.redirect(`${VUE_APP_UI}/dashboard?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}&id_token=${tokens.id_token}`)
     } catch (err) {
-      debug(err.stack)
-      res.status(500).send('Failed to get Access Tokens.')
+      res.status(500).send(err)
     }
   }
 
@@ -32,12 +26,11 @@ function yahooController(service) {
     const { refresh_token } = req.query
     try {
       const tokens = await service.refreshToken(refresh_token)
-      // debug(`accesstoken: ${tokens.accesstoken}`)
-      // debug(`refresh_token: ${tokens.refresh_token}`)
+
       res.send(tokens)
     } catch (err) {
       debug(err.stack)
-      res.status(500).send('Failed to Refresh Token.')
+      res.status(500).send(err)
     }
   }
 
