@@ -66,16 +66,16 @@ app.get('/', (req, res) => {
   res.send("SCAD-SERVER SUCCESSFUL!")
 })
 
-var key = fs.readFileSync('./certificates/key.pem');
-var cert = fs.readFileSync('./certificates/cert.pem');
+var key = fs.readFileSync('./certificates/selfsigned.key');
+var cert = fs.readFileSync('./certificates/selfsigned.crt');
 
 var credentials = {key: key, cert: cert}
 
-// if (inDevelopment()) {
-//   var httpsServer = https.createServer(credentials, app)
-//   httpsServer.listen(port, () => { debug(`HTTPS listening on port ${chalk.green(port)}`) })
-// } else {
+if (inDevelopment()) {
+  var httpsServer = https.createServer(credentials, app)
+  httpsServer.listen(port, () => { debug(`HTTPS listening on port ${chalk.green(port)}`) })
+} else {
   var httpServer = http.createServer(app)
   httpServer.listen(port, () => { debug(`HTTP listening on port ${chalk.green(port)}`) })
-// }
+}
 module.exports = app;

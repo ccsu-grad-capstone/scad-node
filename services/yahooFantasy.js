@@ -236,15 +236,9 @@ function yahooFantasy() {
   async function getCurrentYahooGame(accesstoken) {
     debug('getCurrentYahooGame')
     try {
-      debug('*')
       var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
-      debug('**')
       yf.setUserToken(accesstoken)
-      debug('***')
-      
       let result = await yf.game.meta('nfl')
-      debug('****')
-
       return result
     } catch (error) {
       debug('ERR getCurrentYahooGame', error)

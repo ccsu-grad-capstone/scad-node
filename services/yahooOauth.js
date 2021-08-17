@@ -9,9 +9,6 @@ var parser = xml2js.Parser({ explicitArray: false })
 
 function yahooOauth() {
   function getAccessTokens(code) {
-    debug('code', code)
-    debug('YAHOO_REDIRECT', YAHOO_REDIRECT)
-    debug('YAHOO_GET_TOKEN', YAHOO_GET_TOKEN)
 
     const agentOptions = {
       rejectUnauthorized: false
@@ -24,7 +21,7 @@ function yahooOauth() {
       headers: { 
         'content-type': 'application/x-www-form-urlencoded',
         'Authorization': `Basic ${YAHOO_BASIC_AUTH}`},
-      data: `grant_type=authorization_code&redirect_uri=${YAHOO_REDIRECT}&  =${code}`,
+      data: `grant_type=authorization_code&redirect_uri=${YAHOO_REDIRECT}&code=${code}`,
       url: `${YAHOO_GET_TOKEN}`,
       agent: agent,
     }
