@@ -8,10 +8,12 @@ const scadPlayer = require('../controllers/scadPlayer')
 const debug = require('debug')('app:scadPlayerRouter')
 const scadAuth = require('../utilities/scadAuth')
 const { result } = require('lodash')
+const yf = require('../services/yahooFantasy')
 
 const scadPlayerRouter = express.Router()
 
 scadPlayerRouter.get('/:id', scadAuth(), getById)
+scadPlayerRouter.get('/yahoo/:yahooGameKey/:yahooLeagueId/franchiseTagged', scadAuth(), getFranchiseTaggedPlayers)
 scadPlayerRouter.get('/yahoo/:yahooGameKey/:yahooLeagueId/player/:yahooPlayerId', scadAuth(), getByYahooIds)
 scadPlayerRouter.put('/:id', scadAuth(), update)
 scadPlayerRouter.post('/', scadAuth(), create)
@@ -27,6 +29,29 @@ async function getById(req, res) {
     const result = await scadPlayer.getById(id)
     res.json({
       scadPlayer: result,
+    })
+  } catch (error) {
+    debug(error)
+    res.status(500).send('An Error Occured Retrieving Scad Player')
+  }
+}
+
+async function getFranchiseTaggedPlayers(req, res) {
+  const { yahooGameKey, yahooLeagueId } = req.params
+  const { accesstoken } = req.headers
+  try {
+    const result = await scadPlayer.getFranchiseTaggedPlayers(yahooLeagueId)
+    let players = []
+    for (const sp of result) {
+      let yp = await yf.getPlayer(accesstoken, yahooGameKey, sp.yahooPlayerId)
+      let player = {
+        scadPlayer: sp,
+        yahooPlayer: yp
+      }
+      players.push(player)
+    }
+    res.json({
+      scadPlayerFranchiseTagged: players
     })
   } catch (error) {
     debug(error)

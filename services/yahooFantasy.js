@@ -356,6 +356,20 @@ function yahooFantasy() {
     return split[2]
   }
 
+  async function getPlayer(accesstoken, yahooGameKey, yahooPlayerId) {
+    debug('getPlayer')
+    try {
+      var yf = new YahooFantasy(YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
+      yf.setUserToken(accesstoken)
+
+      let player = await yf.player.meta(`${yahooGameKey}.p.${yahooPlayerId}`)
+      return player
+    } catch (error) {
+      debug('ERR getPlayer', error)
+      throw `Error connecting to Yahoo Fantasy`
+    }
+  }
+
   return {
     getGames,
     getGameKey,
@@ -378,6 +392,7 @@ function yahooFantasy() {
     getUserLeaguesBySeason,
     getAllCommishLeagues,
     getAllLeaguePlayers,
+    getPlayer
   }
 }
 

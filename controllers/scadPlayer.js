@@ -21,6 +21,11 @@ async function getAllByScadLeagueId(id) {
   return await ScadPlayer.find({ scadLeagueId: id })
 }
 
+async function getFranchiseTaggedPlayers(yahooLeagueId) {
+  debug('Getting all Franchise Tagged ScadPlayers for league yahooLeagueId', yahooLeagueId)
+  return await ScadPlayer.find({ yahooLeagueId: yahooLeagueId, isFranchiseTag: true })
+}
+
 async function getAllByYahooLeagueId(yahooGameKey, yahooLeagueId) {
   debug('Getting all ScadPlayers for league by yahooLeagueId', yahooGameKey, yahooLeagueId)
   let sl = await ScadLeague.findOne({ yahooGameKey: yahooGameKey, yahooLeagueId: yahooLeagueId })
@@ -165,4 +170,5 @@ module.exports = {
   update,
   remove,
   updatePlayersSalaries,
+  getFranchiseTaggedPlayers
 }
